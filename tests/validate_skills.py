@@ -23,6 +23,9 @@ errors, warnings = [], []
 err = errors.append
 warn = warnings.append
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# Private/local-environment details must never ship in a public skill library.
+LEAK_RE = re.compile(r"(~/qa-agent|/Users/[A-Za-z0-9._-]+|~/Desktop|mcp__claude_ai_|this harness|the QA harness|"
+                     r"seen in this environment|this session|\bqa (smoke|test|regression|security|report)\b)")
 
 
 def check_skills(skills):
@@ -61,6 +64,10 @@ def check_skills(skills):
         body = s["body"]
         if not re.search(r"^# .+", body, re.M):
             err(f"{d}: body needs a top-level '# Title'")
+        for text_to_scan, where in ((text, "SKILL.md"),):
+            leak = LEAK_RE.search(text_to_scan)
+            if leak:
+                err(f"{d}: {where} contains a private/local-environment reference: '{leak.group(0)}'")
         if s["lines"] < 20:
             warn(f"{d}: only {s['lines']} lines; consider deepening")
         for m in re.finditer(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)", body):

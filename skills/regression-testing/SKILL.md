@@ -10,31 +10,49 @@ metadata:
 
 # Regression Testing
 
-## Scoping a regression pass
-Don't blindly re-run everything every time — scope by change impact:
-1. **Diff-driven scope**: what files/modules changed? Trace which features depend on them (shared components, shared API endpoints, shared DB tables/migrations).
-2. **Always-run core**: checkout/payment, auth/login, and whatever the business calls its "money path" — regardless of whether the diff touches them, run these every release as a floor.
-3. **Full regression** only for major releases, schema migrations, or dependency upgrades touching shared infra (auth libs, ORMs, framework versions).
+Regression testing proves that **what worked before still works after a change**. The craft is choosing *enough* tests, fast, without re-running the world every time.
 
-## Building a regression suite
-- Promote flows from manual/exploratory testing into automation once they've been run manually 2-3 times and are stable — see [[test-automation]].
-- Tag tests by area/feature so partial regression runs are possible (`@checkout`, `@auth`, `@admin`).
-- Keep the suite fast enough to run every PR (smoke tier, minutes) with a separate nightly/pre-release full tier.
+## 1. Scope by change impact
+1. **Diff-driven:** what files/modules changed? Trace consumers: shared components, API endpoints, DB tables/migrations, feature flags, configs.
+2. **Always-run core (the floor):** login/auth, checkout/payment or your business "money path", data export/import: run every release regardless of the diff.
+3. **Risk-weight** the rest: likelihood of breakage (size and complexity of change, code churn, past defects) × impact (users, revenue, safety).
+4. **Full regression** only for major releases, schema migrations, or upgrades of shared infrastructure (framework, ORM, auth library).
 
-## Common regression sources to specifically re-check
-- Shared components/design system changes — check every consumer, not just the one that prompted the change.
-- Database migrations — check both new-record behavior AND existing legacy-data behavior (old rows without new columns populated).
-- Dependency/library upgrades — check changelogs for breaking changes, not just "tests still pass" (tests may not cover the changed behavior).
-- Config/feature-flag changes — verify both flag-on and flag-off states still work, and that the flag actually gates what it claims to.
-
-## Running it via this harness
+## 2. Automate test selection
+```bash
+jest --changedSince=origin/main            # JS: tests related to changed files
+pytest --picked=branch  # pytest-picked;  or pytest-testmon:  pytest --testmon
+nx affected -t test / turbo run test --filter=...[origin/main]   # monorepos
+git diff --name-only origin/main...HEAD | xargs -n1 ./map-to-tests.sh   # custom mapping via tags/owners
 ```
-qa regression
-```
-Runs the harness's regression suite through the `qa` CLI dispatcher; results land in `~/qa-agent/reports/`.
+Tag tests by feature and risk (`@checkout @auth @smoke @p0`) so partial runs are one flag away. Predictive selection tools (e.g. Launchable) learn from history when the suite is large.
 
-## Triage discipline
-When a regression test fails:
-1. Confirm it's a real regression (re-run once, rule out flakiness — see [[test-automation]] flaky-test triage) before filing.
-2. Bisect to the change that caused it if not obvious (git bisect, or compare against the last known-good deploy).
-3. File via [[bug-reporting]] with the specific commit/PR that introduced it if identifiable — this is the single most useful piece of info for a fast fix.
+## 3. Suite tiers
+| Tier | When | Budget | Contents |
+| :--- | :--- | :--- | :--- |
+| Smoke | every commit/PR | < 5 min | critical paths (`smoke-sanity-testing`) |
+| Targeted | every PR | < 15 min | tests mapped to the change + core floor |
+| Full | nightly / pre-release | hours | everything, incl. slower E2E and cross-browser |
+| Extended | release candidate | as needed | perf baseline, security scan, migration rehearsal |
+
+Promote a manual/exploratory flow to automation after it has been run manually 2–3 times and is stable (`test-automation`). **Every fixed production bug gets a regression test** that fails without the fix.
+
+## 4. Regression sources to re-check on purpose
+- **Shared components/design system:** every consumer, not just the one that triggered the change.
+- **Migrations:** new-record behavior **and** legacy rows (old data without new columns), rollback path (`data-migration-testing`).
+- **Dependency upgrades:** read the changelog for breaking changes; passing tests may not cover the changed behavior.
+- **Config/flags:** flag-on and flag-off both work (`configuration-feature-flag-testing`).
+- **Cross-cutting:** auth, permissions, caching, i18n, time zones, feature interactions, integrations and webhooks.
+- **Non-functional drift:** performance vs baseline, bundle size, accessibility, visual diffs (`visual-testing`).
+
+## 5. Triage a failing regression test
+1. **Re-run once** to rule out flakiness (`flaky-test-management`); never file a flake as a regression.
+2. **Bisect** to the culprit: `git bisect run ./run-one-test.sh`, or compare with the last known-good deploy/build.
+3. Decide: product bug / intended change (update the test with justification) / test bug / environment.
+4. File with the introducing commit/PR when known (`bug-reporting`); it is the most useful fact for a fast fix.
+
+## 6. Measure
+Regression escape rate (bugs found in prod that an existing test *should* have caught) · suite duration and flake rate · % of defects that produced a new test · diff coverage on changed lines (`code-coverage-analysis`). Prune tests that never fail and duplicate others; keep the suite fast enough that people run it.
+
+## Related
+`smoke-sanity-testing`, `test-automation`, `flaky-test-management`, `release-readiness-testing`, `code-coverage-analysis`, `bug-reporting`

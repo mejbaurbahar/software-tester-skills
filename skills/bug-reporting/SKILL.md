@@ -10,58 +10,68 @@ metadata:
 
 # Bug Reporting
 
-This is the shared reporting spine for every testing skill in this harness — [[manual-testing]], [[functional-testing]], [[api-testing]], [[security-testing]], [[performance-testing]], [[accessibility-testing]], [[mobile-testing]], [[regression-testing]] all file through this format. Canonical source: `~/qa-agent/QA_RULES.md`.
+A good bug report lets a stranger reproduce, understand and prioritize the problem in two minutes. This is the shared format every testing skill files through.
 
-## Verification standard before filing
-Never declare a defect (or a passing test) based on assumption:
-- Verify HTTP status codes, not just "the page looked wrong."
-- Verify actual DOM/element state, not a screenshot glance.
-- Verify database mutations or backend state for anything claiming data was/wasn't persisted.
-- Capture console errors and network request/response evidence, not just a description.
-- In browser testing, wait for network-idle or selector-availability before asserting — a false failure from a race condition wastes everyone's time.
+## Verify before you file
+Never declare a defect (or a pass) on assumption:
+- Check the **actual** HTTP status, DOM state and persisted data, not just how the page looked.
+- Capture **console errors and network request/response** evidence.
+- In browser tests wait for a condition (selector/network idle) before asserting; a race-condition false failure wastes everyone's time.
+- Reproduce **at least twice** and note the rate ("5/5", "2/10"). Try to isolate the minimal steps, and check whether it is a duplicate.
+- Decide whether it is a product bug, test bug, environment issue or requirement gap.
 
-## Severity scale
-- **Blocker (Sev 1)**: system crash, core transaction impossible, data loss, catastrophic resource leak.
-- **Critical (Sev 2)**: core functionality severely impaired, no acceptable workaround (auth broken, checkout broken, cross-tenant data leak).
-- **Major (Sev 3)**: non-critical feature failure, or a high-frequency edge case with a workaround.
-- **Minor (Sev 4)**: cosmetic, copy error, low-impact UX annoyance.
-
-Severity is about real-world impact and exploitability/frequency — not how the bug was found. A cosmetic misalignment stays Minor even if found during a security audit; an unauthenticated data leak is Critical/Blocker even if it looks like "just a UI thing" at first glance.
+## Severity vs priority
+| Severity (impact on users/system) | Meaning |
+| :--- | :--- |
+| **Blocker (S1)** | Crash, data loss/corruption, core transaction impossible, security breach in progress |
+| **Critical (S2)** | Core feature severely impaired, no workaround (auth broken, checkout broken, cross-tenant data leak) |
+| **Major (S3)** | Non-core feature fails, or a common edge case with a workaround |
+| **Minor (S4)** | Cosmetic, copy, low-impact annoyance |
+**Priority (P0–P3)** is the *order to fix*, set with product/engineering using business context. Severity reflects real-world impact and exploitability, not how the bug was found: a cosmetic issue found during a security audit stays Minor; an unauthenticated data leak is Critical even if it looks like "just a UI thing".
 
 ## Report template
 ```markdown
-# [BUG] [Component] Title of the Issue
+# [Component] Short, specific symptom (not "X is broken")
 
-- **Severity**: Blocker | Critical | Major | Minor
-- **Priority**: P0 | P1 | P2 | P3
-- **Environment**: Staging / Production / Local (Browser/OS/device version)
-- **URL / Endpoint**: https://...
+- **Severity / Priority**: Critical / P1
+- **Environment**: Staging · build 2026.09.21-abc123 · Chrome 128 / macOS 15 (or device/OS)
+- **URL / endpoint**: https://…
+- **Reproducibility**: 5/5
 
 ### Preconditions
-- User logged in as admin / test account, feature flag state, etc.
+Account/role, data state, feature flags.
 
-### Reproduction Steps
-1. Navigate to ...
-2. Click on ...
-3. Input ...
+### Steps to reproduce
+1. …
+2. …
 
-### Expected Result
-...
+### Expected result
+…
+### Actual result
+…
 
-### Actual Result
-...
+### Evidence
+- Console: `TypeError: Cannot read properties of undefined (reading 'id')` at cart.js:88
+- Network: `POST /api/v1/orders` → 500, response body/`x-request-id: 7f3c…`
+- Screenshot/video/HAR/log excerpt (redacted)
 
-### Diagnostics & Evidence
-- **Console Errors**: `TypeError: ...`
-- **Network Request**: `POST /api/v1/...` -> Status `500 Internal Server Error`
-- **Screenshot**: `~/qa-agent/reports/screenshots/...`
-
-### Impact & Root Cause Analysis
-...
+### Impact and suspected cause
+Who is affected, how many, workaround. Mark theories clearly as hypotheses.
 ```
+Title formula: `[Area] Action → wrong result (condition)`, e.g. `[Checkout] Applying coupon after changing country → total not recalculated`.
 
-## Filing mechanics in this harness
-- Save reports under `~/qa-agent/reports/`.
-- `qa report` surfaces/aggregates filed reports through the CLI dispatcher.
-- Never include a full working exploit chain for security findings beyond what's needed to reproduce internally — keep destructive PoCs out of shared reports.
-- Redact real user PII/credentials from evidence (screenshots, logs) before saving/sharing a report, even on internal staging environments.
+## Filing mechanics
+```bash
+gh issue create --title "[Checkout] Coupon not recalculated after country change" --body-file bug.md --label bug,severity:critical
+```
+Attach the smallest useful evidence; link to the failing test, trace or CI run; reference the commit or release that introduced it if known. Group symptoms with one root cause into one report.
+
+## Safety and privacy
+- **Redact** real user PII, tokens, passwords and API keys from screenshots, HARs and logs, even on internal environments.
+- For **security findings**, use the private disclosure channel (security advisory, restricted tracker, security@ mailbox), include only what is needed to reproduce and verify the fix, and do not publish working exploit chains.
+
+## Quality checklist
+Title specific · steps numbered and minimal · expected vs actual explicit · environment and build named · evidence attached · severity justified · duplicate checked · no secrets.
+
+## Related
+`manual-testing`, `exploratory-testing`, `functional-testing`, `api-testing`, `regression-testing`, `test-metrics-reporting`

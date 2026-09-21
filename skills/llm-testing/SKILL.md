@@ -11,7 +11,7 @@ metadata:
 # LLM Testing
 
 ## This machine already has MLflow tooling for parts of this
-This environment has the `mlflow:agent-evaluation`, `mlflow:instrumenting-with-mlflow-tracing`, `mlflow:analyzing-mlflow-trace`/`analyzing-mlflow-session`, `mlflow:build-a-scorer`, and `mlflow:querying-mlflow-metrics` skills available — use those directly for trace instrumentation and scored evaluation runs rather than reinventing the harness. This skill covers the testing *methodology*; MLflow's skills cover the *execution mechanics* on this setup.
+For trace instrumentation and scored evaluation runs, use an evaluation toolkit such as MLflow, promptfoo, DeepEval or LangSmith (see `ai-agent-evaluation` and `rag-evaluation-testing`). This skill covers the testing *methodology*; those tools cover the execution mechanics.
 
 ## What's fundamentally different from classical software testing
 Non-determinism (same input can produce different output) and no single "correct" output for open-ended generation — you're testing distributions and properties, not exact-match assertions, most of the time.

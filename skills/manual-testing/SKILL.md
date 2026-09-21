@@ -62,4 +62,4 @@ Pick techniques based on the input space, don't just guess values:
 - Always verify against the **actual backend state** (DB row, API response), not just what the UI shows — the UI can lie.
 
 ## Reporting
-When a manual test finds a defect, use the [[bug-reporting]] skill's template so severity/repro/evidence are consistent across the QA harness (`~/qa-agent/QA_RULES.md` is the canonical format here).
+When a manual test finds a defect, use the [[bug-reporting]] skill's template so severity/repro/evidence are consistent across every testing skill.

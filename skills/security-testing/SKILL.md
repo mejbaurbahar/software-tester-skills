@@ -10,36 +10,49 @@ metadata:
 
 # Security Testing
 
-**Scope guardrail**: only test systems the user owns, controls, or has explicit written authorization to test (client engagements, CTFs, bug bounty programs in scope). Refuse destructive testing (data-deleting payloads, DoS, mass scanning of third-party infra) even when asked — flag it and propose a safe alternative (staging environment, rate-limited scan).
+> **Scope guardrail:** test only systems you own or have explicit written authorization to test (your product, client engagements, CTFs, in-scope bug bounties). Prefer staging with synthetic data. Do not run destructive payloads, denial-of-service, or mass scans of third-party infrastructure; propose a safe alternative instead.
+
+## Approach
+1. **Model threats first** (`threat-modeling`): assets, entry points, trust boundaries.
+2. **Automate the cheap wins in CI**: static analysis (`static-analysis-testing`), dependency and secret scanning (`supply-chain-dependency-testing`), IaC/container checks (`iac-container-security-testing`).
+3. **Test authentication and authorization deliberately** (`authn-authz-testing`); this is where the worst bugs live.
+4. **Manually probe business logic**: automation cannot understand your rules.
+5. **Report, fix, and add a regression test** for every finding.
 
 ## OWASP Top 10 quick-check pass
-1. **Broken Access Control** — IDOR (increment/guess resource IDs across users/tenants), missing function-level auth checks (can a regular user hit an admin API route directly?), path traversal on file endpoints.
-2. **Cryptographic Failures** — secrets/PII in plaintext (logs, DB columns, API responses), missing HTTPS/HSTS, weak/default credentials (this harness has flagged `admin/admin123` before — always check for default creds on new installs).
-3. **Injection** — SQLi, NoSQLi, command injection, LDAP injection in every input, including headers and file names, not just visible form fields.
-4. **Insecure Design** — missing rate limiting on auth/password-reset endpoints, business logic that trusts client-side values (price, discount, role sent from frontend).
-5. **Security Misconfiguration** — verbose error pages/stack traces in production, default admin panels reachable, directory listing enabled, missing security headers.
-6. **Vulnerable Components** — outdated JS libs/CMS plugins with known CVEs (check versions against CVE databases).
-7. **Auth Failures** — weak password policy, no lockout/rate-limit on login, session tokens not invalidated on logout, predictable session IDs, missing MFA where expected.
-8. **Software/Data Integrity** — unsigned/unverified auto-update or webhook payloads, CI/CD supply-chain exposure.
-9. **Logging/Monitoring Failures** — no audit trail for privileged actions; can't tell if an account was compromised after the fact.
-10. **SSRF** — any server-side "fetch this URL" feature (webhooks, image-from-URL, PDF-from-URL) tested with internal IPs / cloud metadata endpoints (`169.254.169.254`) to confirm it's blocked.
+| Risk | What to check |
+| :--- | :--- |
+| **Broken access control** | Object IDs across users/tenants (IDOR), function-level checks (can a normal user call an admin route?), path traversal on file endpoints, forced browsing |
+| **Cryptographic failures** | Secrets/PII in plaintext (logs, DB, responses), HTTPS everywhere + HSTS, weak/default credentials on new installs, sensitive data in URLs |
+| **Injection** | SQL/NoSQL/OS/LDAP/template injection in **every** input incl. headers and filenames; use parameterized queries and output encoding |
+| **Insecure design** | No rate limit on login/reset/OTP, business rules trusting client values (price, role), missing abuse-case handling |
+| **Security misconfiguration** | Verbose errors/stack traces, default admin panels, directory listing, debug mode, open cloud storage, missing headers |
+| **Vulnerable/outdated components** | Known-CVE libraries and plugins (SCA scan), unsupported runtimes |
+| **Authentication failures** | Weak password policy, no lockout, session not rotated on login, tokens not invalidated on logout, predictable IDs, MFA gaps |
+| **Software/data integrity** | Unsigned updates/webhooks, insecure deserialization, CI/CD exposure |
+| **Logging & monitoring failures** | No audit trail for privileged actions, no alerting on repeated failures |
+| **SSRF** | Any server-side "fetch this URL" feature (webhooks, image/PDF from URL) must block internal ranges and cloud metadata addresses |
 
-## Header audit (fast, always worth doing)
-Check via `curl -sI <url>` or the network tab:
-- `Content-Security-Policy` present and not so loose it defeats XSS protection (also verify it doesn't accidentally block legitimate app functionality like wp-admin — seen in this environment before).
-- `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` or `frame-ancestors`, `Referrer-Policy`.
-- Cookies: `Secure`, `HttpOnly`, `SameSite` set appropriately on session cookies.
+## Fast header and cookie audit
+```bash
+curl -sI https://staging.example.com | grep -iE "strict-transport|content-security|x-content-type|x-frame|referrer-policy|permissions-policy|set-cookie|server|x-powered-by"
+```
+Expect: `Strict-Transport-Security`, a Content-Security-Policy that is strict yet does not break legitimate features, `X-Content-Type-Options: nosniff`, `frame-ancestors` or `X-Frame-Options`, `Referrer-Policy`; cookies `Secure; HttpOnly; SameSite`; no version banners.
 
-## Auth/session testing
-- Session fixation: does the session ID change after login?
-- Logout: is the token actually invalidated server-side, or just cleared client-side (test by reusing the old token after logout)?
-- Password reset: token single-use? expires? not leaked in URL logs/referrer headers?
-- Multi-tenant isolation: authenticated as tenant A, attempt every read/write against tenant B's resource IDs.
+## Session and account flows
+Session ID changes after login (fixation) · logout invalidates the token **server-side** (replay the old token) · password-reset tokens are single-use, short-lived and not leaked via URL/referrer · MFA cannot be skipped via another endpoint · multi-tenant isolation on every read **and** write.
 
-## Tools in this harness
-- HawkScan DAST (`hawkscan` skill) — after any meaningful code change, run the scan loop and fix findings before calling work done, per the autonomous-security policy already active this session.
-- Semgrep Guardian is scanning files as they're written in this session already — treat its findings as an additional signal, not a replacement for manual review.
-- `qa security` dispatcher command for the existing QA harness security skill.
+## Tools (use only on authorized targets)
+| Purpose | Tools |
+| :--- | :--- |
+| Intercepting proxy, manual testing | Burp Suite, OWASP ZAP, mitmproxy |
+| Automated baseline scan on staging | ZAP baseline/API scan, Nuclei templates |
+| Static/secret/dependency scanning | Semgrep, CodeQL, gitleaks, Trivy, OSV-Scanner |
+| TLS | `testssl.sh`, `sslyze` |
+| API contract security | `42crunch-api-security-testing` |
 
-## Triage and reporting
-Rate severity by real-world impact and exploitability, not just OWASP category — an unauthenticated IDOR leaking PII is Blocker/Critical; a missing header on a static marketing page is Minor. Use [[bug-reporting]]'s format and never include a working exploit chain in a shared report beyond what's needed to reproduce internally.
+## Triage and severity
+Rate by real-world exploitability and impact, not only category: an unauthenticated IDOR leaking personal data is Critical; a missing header on a static marketing page is Minor. Reproduce, document minimal steps, and share findings through the private channel your team uses. Do not put working exploit chains in widely shared reports beyond what is needed to verify the fix. Use `bug-reporting`.
+
+## Related
+`security-owasp`, `security-hardening`, `authn-authz-testing`, `threat-modeling`, `static-analysis-testing`, `supply-chain-dependency-testing`, `compliance-testing`

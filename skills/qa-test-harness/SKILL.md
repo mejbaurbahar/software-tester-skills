@@ -34,7 +34,7 @@ Always interact with the user's active Chrome browser session using the `chrome-
 
 ### 2. Full System & Multi-Environment Testing
 - **Local Repositories & Test Runners**:
-  - Locate test suites across the user's folders (`~/Desktop/Office`, `~/Desktop/Personal`, etc.).
+  - Locate test suites in the repositories or folders the user points you at.
   - Execute test runners (Pytest, Playwright, Jest, Vitest, Cypress, Mocha, k6).
   - Parse test reports (HTML, JUnit XML, JSON) and highlight failures.
 - **API & Backend Verification**:

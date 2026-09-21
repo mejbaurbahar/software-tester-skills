@@ -34,7 +34,7 @@ Treat "no observability for this new critical path" as a real finding — file i
 - **Logs**: structured logging + a queryable backend (CloudWatch Logs Insights, Datadog Logs, Loki).
 - **Metrics**: Prometheus + Grafana, Datadog, CloudWatch Metrics.
 - **Tracing**: OpenTelemetry (vendor-neutral instrumentation) feeding into Jaeger, Tempo, Datadog APM, or similar.
-- **Error tracking**: Sentry — correlates errors with release/deploy, gives stack traces and affected-user counts; use `mcp__claude_ai_Sentry__*` tools in this environment when investigating a live issue.
+- **Error tracking**: Sentry — correlates errors with release/deploy, gives stack traces and affected-user counts; use your Sentry integration (web UI, CLI or MCP) when investigating a live issue.
 
 ## Cross-link
 Feeds directly into [[qa-code-intelligence]] for root-cause analysis, and into [[autonomous-qa-orchestration]]'s step of investigating backend state before filing a bug.

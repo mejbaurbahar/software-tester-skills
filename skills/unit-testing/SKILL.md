@@ -10,40 +10,76 @@ metadata:
 
 # Unit & Component Testing
 
-## Overview
-Unit testing validates the smallest testable units of code (functions, methods, classes, components) in complete isolation from external dependencies (databases, networks, filesystem, third-party services).
+Unit tests validate the smallest testable behaviors (functions, methods, classes, components) **in isolation** from slow or unreliable dependencies. Done well they are your fastest feedback loop and the safety net for refactoring.
 
-## Core Principles
-1. **Isolation**: Never touch real external systems in unit tests. Use test doubles (stubs, mocks, fakes).
-2. **Speed & Determinism**: Unit tests must execute in milliseconds and produce 100% deterministic results regardless of execution order or environment.
-3. **AAA Pattern**:
-   - **Arrange**: Set up test fixtures, input data, and expected outputs.
-   - **Act**: Execute the specific unit under test.
-   - **Assert**: Verify the result, state change, or mock interaction.
-4. **One Logical Assertion per Test**: Focus on one behavioral outcome per test case for pinpoint failure diagnostics.
+## Principles (F.I.R.S.T.)
+**F**ast (milliseconds) · **I**solated (no network, DB, clock, filesystem, randomness) · **R**epeatable (same result anywhere) · **S**elf-validating (assert, do not eyeball) · **T**imely (written with or before the code, `tdd-workflow`).
+- **Arrange-Act-Assert:** set up inputs, execute the unit, verify the outcome. One behavior per test; the name states the behavior.
+- **Test behavior, not implementation:** assert on public outputs and observable effects so tests survive refactoring.
 
-## Test Design Techniques
-- **Boundary Value Analysis (BVA)**: Test values at boundaries: `min - 1`, `min`, `nominal`, `max`, `max + 1`.
-- **Equivalence Partitioning (EP)**: Divide input domain into valid and invalid partitions; select representative values from each.
-- **Error Guessing & Defensive Checks**: `null`, `undefined`, empty strings, NaN, overflow values, special unicode characters.
-- **Property-Based Testing**: Use property generators (e.g. `Hypothesis` for Python, `fast-check` for JS/TS) to verify mathematical invariants across thousands of random inputs.
+## What to test
+Business rules and calculations · branches and error paths · boundaries (`test-design-techniques`) · invariants (`property-based-testing`) · state transitions · input validation · idempotence · async success/failure/timeouts · component rendering and interaction (Testing Library: query by role/label, act like a user).
 
-## Test Doubles Quick Reference
-| Double | Purpose | When to Use |
-| :--- | :--- | :--- |
-| **Dummy** | Passed around but never actually used | Filling required parameter signatures |
-| **Stub** | Returns canned answers to calls made during test | Providing fixed input data without running real logic |
-| **Spy** | Records information about calls made to it | Verifying call counts, arguments, or execution order |
-| **Mock** | Pre-programmed with expectations of calls it must receive | Behavioral verification of interactions |
-| **Fake** | Working implementation with shortcuts (e.g. in-memory DB) | Complex stateful unit/component isolation |
+## Test doubles
+| Double | Use when |
+| :--- | :--- |
+| **Dummy** | A parameter is required but unused |
+| **Stub** | You need canned return values |
+| **Spy** | You must check calls, arguments or order |
+| **Mock** | Behavior verification of an interaction is the point |
+| **Fake** | A lightweight working implementation (in-memory repo) beats stubbing many calls |
+Double **only at real boundaries** (I/O, time, randomness, other modules' side effects). If a test mostly asserts that mocks were called, it verifies wiring, not logic.
 
-## Recommended Tooling
-- **JavaScript / TypeScript**: Jest, Vitest, Node Test Runner (`node:test`), Testing Library (React/Vue), fast-check.
-- **Python**: Pytest, unittest.mock, pytest-mock, Hypothesis.
-- **Go**: `testing` package, testify (`assert`, `mock`), gomock.
-- **Java / Kotlin**: JUnit 5, Mockito, AssertJ, jqwik.
+## Examples
+```python
+# pytest: parametrized boundaries + exception + frozen time
+import pytest
+from freezegun import freeze_time
 
-## Common Anti-Patterns to Avoid
-- **Testing Implementation Details**: Asserting private variables or internal method sequences instead of public contract outputs.
-- **Over-Mocking**: Mocking everything until the test only verifies mock wiring rather than actual logic.
-- **Flaky Unit Tests**: Dependencies on system clock (`Date.now()`), filesystem state, or network. Always freeze or stub time.
+@pytest.mark.parametrize("age,expected", [(17,"minor"),(18,"adult"),(64,"adult"),(65,"senior")])
+def test_age_band(age, expected): assert band(age) == expected
+
+def test_negative_age_rejected():
+    with pytest.raises(ValueError, match="age"): band(-1)
+
+@freeze_time("2026-03-08 06:59:59")
+def test_token_expires_at_boundary(): assert not Token(ttl=1).expired()
+```
+```ts
+// Vitest/Jest: async + component
+it('debounces search and shows results', async () => {
+  vi.useFakeTimers(); const search = vi.fn().mockResolvedValue([{ id: 1, name: 'Mug' }]);
+  render(<Search api={search} />);
+  await userEvent.type(screen.getByRole('searchbox'), 'mug');
+  await vi.advanceTimersByTimeAsync(300);
+  expect(search).toHaveBeenCalledTimes(1);
+  expect(await screen.findByText('Mug')).toBeVisible();
+});
+```
+```java
+// JUnit 5 + AssertJ + Mockito
+@Test void refundsCannotExceedPayment() {
+  var svc = new RefundService(paymentRepo);              // paymentRepo is a mock/fake
+  assertThatThrownBy(() -> svc.refund("P1", Money.of(150)))
+      .isInstanceOf(RefundTooLargeException.class);
+}
+```
+
+## Tooling
+| Stack | Frameworks |
+| :--- | :--- |
+| JS/TS | Vitest, Jest, node:test, Testing Library, fast-check |
+| Python | pytest, unittest.mock/pytest-mock, Hypothesis, freezegun |
+| Java/Kotlin | JUnit 5, Mockito/MockK, AssertJ, jqwik |
+| .NET | xUnit/NUnit, Moq/NSubstitute, FluentAssertions |
+| Go | `testing`, testify, gomock |
+| Rust | built-in `#[test]`, proptest, insta |
+
+## Quality checks
+Mutation testing shows whether tests actually detect changes (`mutation-testing`); coverage shows what is *not* tested (`code-coverage-analysis`); fail-first discipline proves a test can fail; keep the suite under a few seconds per module.
+
+## Anti-patterns
+Asserting private fields or call sequences · over-mocking · shared mutable fixtures · clock/network/filesystem dependence · giant tests with many reasons to fail · conditionals or loops in tests · testing framework code · snapshot tests of huge outputs (`snapshot-golden-testing`) · ignoring failing tests with `skip`.
+
+## Related
+`tdd-workflow`, `property-based-testing`, `mutation-testing`, `code-coverage-analysis`, `integration-testing`, `test-design-techniques`

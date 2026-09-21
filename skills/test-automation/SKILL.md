@@ -10,45 +10,75 @@ metadata:
 
 # Test Automation
 
-## Environment (this machine)
-- Python venv: `~/qa-agent/.venv/bin/python` — has pytest, playwright, requests, locust.
-- Dispatcher: `qa` CLI (`qa test`, `qa smoke`, `qa regression`, `qa security`, `qa report`).
-- Chrome MCP tools are available for live-browser automation/inspection alongside scripted Playwright.
+Automation is software: it needs design, review, and maintenance. Automate to get **fast, trustworthy feedback**, not to hit a count.
 
-## What to automate (and what not to)
-Automate:
-- Regression-prone flows run repeatedly (login, checkout, core CRUD).
-- Anything that gates a release (smoke suite).
-- API contract checks — cheap to write, fast to run, high signal.
+## What to automate (and what not)
+| Automate | Delay or avoid |
+| :--- | :--- |
+| Repeated, regression-prone flows (login, checkout, core CRUD) | One-off exploratory checks |
+| Release gates (smoke) | Highly visual/subjective polish (use screenshots + review, `visual-testing`) |
+| API/contract checks: cheap, fast, high signal | Flows still changing weekly (maintenance drag) |
+| Data-heavy rule matrices (parametrized) | Anything you cannot make deterministic yet |
+Put each check at the **lowest level that can catch the bug** (`test-architect`): many unit, a healthy layer of API/integration, few UI journeys.
 
-Don't automate (or automate last):
-- One-off exploratory checks.
-- Highly visual/subjective UI polish — use screenshots + manual review instead.
-- Flows still actively changing week to week (automation will just be a maintenance drag).
+## Choose the framework
+| Need | Good options |
+| :--- | :--- |
+| Modern web E2E | **Playwright** (multi-browser, auto-wait, tracing), Cypress |
+| Legacy/grid/enterprise | Selenium WebDriver (+ Selenide, WebDriverIO) |
+| API | pytest + requests/httpx, REST Assured, Karate, Hurl, supertest |
+| Unit | pytest, Jest/Vitest, JUnit 5, Go `testing`, xUnit/NUnit |
+| Mobile | Appium, Maestro, Detox, XCUITest, Espresso (`mobile-testing`) |
+| BDD | Cucumber, Behave, Reqnroll (`bdd-gherkin-testing`) |
+| Visual | Playwright screenshots, Percy, Chromatic, Applitools |
+Prefer the language your developers already use so they can own and fix the tests.
 
-## Playwright test structure
-- **Page Object Model**: one class per page/component encapsulating locators + actions. Tests read like user stories, not selector soup.
-- **Locators**: prefer role/text/testid locators over CSS/XPath — they survive markup churn. Add `data-testid` to the app if none exist and you own the code.
-- **Waits**: never use hard `sleep()`. Use Playwright's auto-waiting or explicit `wait_for_selector` / `wait_for_load_state("networkidle")`.
-- **Isolation**: each test should set up its own data (via API/fixtures) and not depend on execution order or another test's leftover state.
-- **Assertions**: assert on the outcome (DB state, API response, final DOM state), not intermediate loading states.
+## Design rules that keep suites healthy
+- **Locators:** role/label/text/test-id over CSS/XPath; add `data-testid` if you own the app.
+- **Waits:** never hard `sleep()`; use auto-wait and explicit conditions (`expect(locator).toBeVisible()`, `wait_for_selector`, poll-until with timeout).
+- **Isolation:** each test creates its own data (API/fixtures), never depends on order or another test's leftovers; unique IDs per worker.
+- **Fast login:** authenticate once via API and reuse storage state instead of driving the login UI every test.
+- **Assert outcomes,** not implementation or intermediate loading states; one behavior per test; meaningful names.
+- **Page Object / component objects / fixtures:** encapsulate locators and actions so tests read like user stories; keep assertions in tests, not page objects.
+- **Test data:** builders/factories, not shared static rows (`test-data-engineering`). Reset state cheaply (transaction rollback, DB template, API teardown).
+- **Determinism:** freeze time and seed randomness (`date-time-timezone-testing`); stub 3rd parties (`test-environment-management`).
+- **Independent of environment:** base URL and credentials via env vars/secret store, never hard-coded.
 
-## pytest conventions
-- One fixture per external dependency (auth session, seeded user, API client) — compose via fixture injection, not copy-paste setup.
-- Parametrize equivalence-class/boundary cases with `@pytest.mark.parametrize` instead of near-duplicate test functions.
-- Mark slow/E2E tests (`@pytest.mark.e2e`) separately from fast unit/API tests so CI can run tiers independently.
-- Use `pytest -x --tb=short` while iterating; full traceback + `-ra` summary for CI runs.
+## Examples
+```ts
+// Playwright: fixture + role locators + web-first assertions
+import { test as base, expect } from '@playwright/test';
+const test = base.extend<{ cart: CartPage }>({ cart: async ({ page }, use) => { await use(new CartPage(page)); } });
+test('applies coupon once', async ({ page, cart }) => {
+  await cart.open(); await cart.applyCoupon('WELCOME10');
+  await expect(page.getByRole('status')).toHaveText(/10% off applied/);
+  await expect(cart.total).toHaveText('$90.00');
+});
+```
+```python
+# pytest: fixtures + parametrization + markers
+@pytest.fixture
+def api(base_url): return Api(base_url, token=make_token(role="user"))
 
-## Flaky test triage
-A test that fails intermittently is a bug in the test (or a real race condition) — don't just retry-until-green:
-1. Run it 5–10x locally (`pytest --count=10` or a loop) to confirm flakiness vs. one-off environment issue.
-2. Check for hard waits/timing assumptions, unseeded random data, shared state between tests, animation transitions not waited on.
-3. If it's revealing a real race condition in the app, that's a product bug — report it, don't just harden the test to hide it.
+@pytest.mark.parametrize("qty,ok", [(0, False), (1, True), (99, True), (100, False)])
+@pytest.mark.api
+def test_quantity_limits(api, qty, ok):
+    assert (api.add_to_cart("A-1", qty).status_code == 200) == ok
+```
+```bash
+pytest -m "not e2e" -x --tb=short -q          # fast tier while developing
+pytest -n auto --maxfail=5 -ra                # parallel CI run (pytest-xdist)
+npx playwright test --workers=4 --retries=1 --trace=on-first-retry
+```
+
+## Flaky tests are bugs
+Do not retry-until-green. Reproduce (`--repeat-each`), classify the cause, fix the root cause, and quarantine with an owner and deadline (`flaky-test-management`). A real race condition in the app is a product bug: report it.
 
 ## CI integration
-- Fail the build on any Blocker/Critical-severity assertion failure (see [[bug-reporting]] severity scale).
-- Keep smoke suite under a few minutes; push full regression to a separate longer-running job.
-- Persist screenshots/traces/videos on failure (`~/qa-agent/reports/`) — a failing assertion without evidence wastes the next debugging session.
+Run tiers: smoke on every PR (< 5 min), targeted regression per PR, full nightly (`regression-testing`, `cicd-testing`). Shard and parallelize; publish JUnit/HTML reports, screenshots, traces and videos **on failure**; fail the build on real failures, not on infrastructure noise. Track duration and flake rate (`test-metrics-reporting`).
 
-## Load/perf scripts
-For scripted load testing use `locust` from the same venv — see [[performance-testing]] for methodology.
+## Maintainability checklist
+Naming conventions · code review for tests · no copy-paste (extract helpers) · delete obsolete tests · lint tests (no `.only`, no `sleep`) · dependency updates automated · README for running locally in one command.
+
+## Related
+`e2e-testing`, `unit-testing`, `api-testing`, `flaky-test-management`, `cicd-testing`, `test-environment-management`

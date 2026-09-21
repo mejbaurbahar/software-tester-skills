@@ -11,31 +11,62 @@ metadata:
 # API Testing
 
 ## Why test at the API layer
-Faster, more deterministic, and catches issues the UI might mask (a UI can silently swallow a 500 and show stale cached data). Always cross-check UI-observed bugs against the raw API response before filing — it tells you whether the bug is frontend or backend.
+Faster, more deterministic and more precise than UI tests, and it catches what a UI can hide (a UI may swallow a 500 and show cached data). Always cross-check a UI-observed bug against the raw API response before filing: it tells you whether the fault is frontend or backend.
 
-## Core checklist per endpoint
-- **Status codes**: correct code for success (200/201/204), client error (400/401/403/404/409/422), server error (500). A 200 with an error body in it is a common anti-pattern to flag.
-- **Response schema**: matches documented/expected shape — types, required fields present, no leaked internal fields (password hashes, internal IDs meant to be opaque).
-- **Request validation**: missing required fields, wrong types, extra unexpected fields, malformed JSON — server should reject cleanly, not 500.
-- **Auth**: no token → 401; wrong-role token → 403; expired token → 401 with clear error, not a silent empty response; token for another tenant/user → must not leak cross-tenant data (test this explicitly, it's a common critical bug).
-- **Pagination**: first page, last page, page beyond range, page size 0/negative/huge, consistent ordering across pages (no duplicate/skipped records from concurrent writes).
-- **Idempotency**: does retrying a POST (e.g. payment, order-create) create duplicates? Idempotency-key support if documented.
-- **Rate limiting**: does exceeding the limit return 429 with a sane `Retry-After`, or does it just fail unpredictably?
-- **Error response consistency**: same shape/format for errors across endpoints (don't want one endpoint returning `{error: "..."}` and another a bare string).
+## Per-endpoint checklist
+| Area | What to verify |
+| :--- | :--- |
+| **Status codes** | Right code for success (200/201/204), client error (400/401/403/404/409/415/422/429), server error (5xx). A `200` carrying an error body is an anti-pattern to flag. |
+| **Response schema** | Types, required fields, enums, formats; no leaked internals (password hashes, internal IDs, stack traces); consistent null vs missing. |
+| **Request validation** | Missing/extra/wrong-type fields, malformed JSON, oversized bodies, wrong `Content-Type`, unicode/emoji, boundary values (`test-design-techniques`). Must reject cleanly (4xx), never 500. |
+| **Auth** | No token → 401; wrong role → 403; expired/invalid token → 401 with a clear error; another user's or tenant's object → 403/404 (`authn-authz-testing`). |
+| **Pagination/sorting/filtering** | First, last and out-of-range page; size 0/negative/huge; stable ordering (no duplicates/skips while data changes); cursor validity; total counts. |
+| **Idempotency & retries** | Repeating POST/PUT/DELETE: `Idempotency-Key` honored, no duplicate orders/payments; PUT/DELETE truly idempotent. |
+| **Concurrency** | Parallel updates → conflict detection (`ETag`/`If-Match`, version field), no lost updates (`concurrency-race-condition-testing`). |
+| **Caching & conditional requests** | `ETag`/`Last-Modified`, `304`, `Cache-Control`, `Vary`; private data never cacheable by shared caches. |
+| **Rate limiting** | `429` + `Retry-After`; limits per user/IP/key; limits not bypassable by header tricks. |
+| **Errors** | One consistent error shape across endpoints, ideally RFC 9457 `application/problem+json`; correlation/request ID present; no internals leaked. |
+| **Versioning & compatibility** | Old clients keep working; deprecations announced with `Deprecation`/`Sunset` headers. |
+| **Headers & transport** | CORS (allowed origins are explicit), security headers, TLS, `Content-Type` charset, compression. |
+| **Files/binary** | Upload size/type limits, virus-scan hook, streaming download, range requests. |
+| **Webhooks/callbacks** | Signature verification, retries, duplicates, out-of-order events (`event-driven-messaging-testing`). |
 
-## Contract/schema validation
-- If an OpenAPI/GraphQL schema exists, validate responses against it programmatically rather than eyeballing JSON.
-- Flag drift between documented contract and actual behavior — that's a bug even if "the API works."
+## Contract and schema validation
+Validate responses against the OpenAPI/JSON Schema/GraphQL schema **programmatically**, not by eyeballing JSON. Drift between documentation and behavior is a bug even when "the API works". Consumer-driven contracts: `contract-testing`. Spec-driven fuzzing finds crashes and violations automatically:
+```bash
+schemathesis run https://staging.example.com/openapi.json --checks all --hypothesis-max-examples=100
+dredd openapi.yaml https://staging.example.com          # example-based contract run
+```
 
-## Tools available in this harness
-- `requests` in the qa-agent venv for scripted checks; `curl -i` for quick one-offs (the `-i` shows headers, useful for auth/cache header checks).
-- Claude in Chrome / Chrome DevTools MCP `list_network_requests` / `get_network_request` to capture real requests the frontend makes, then replay/modify them directly.
-- Postman MCP tools (`mcp__claude_ai_Postman__*`) when a collection already exists or is worth building for the project — generate one from observed traffic when useful.
+## Tooling (pick what fits the stack)
+| Need | Tools |
+| :--- | :--- |
+| Quick manual probes | `curl -i`, `httpie`, Postman, Bruno, Insomnia, VS Code REST Client |
+| Scripted suites | `pytest` + `requests`/`httpx`, Jest/Vitest + `supertest`, REST Assured (Java), Playwright `request`, Karate, Hurl |
+| Collections in CI | Newman (Postman), Bruno CLI, Hurl |
+| Mocks/stubs | WireMock, MockServer, MSW, Prism (from OpenAPI) |
+| Traffic capture | Browser DevTools network tab, `mitmproxy`, proxy logs |
+```bash
+curl -sS -i -X POST "$API/orders" -H "Authorization: Bearer $TOKEN" -H "Idempotency-Key: $(uuidgen)" \
+  -H 'Content-Type: application/json' -d '{"sku":"A-1","qty":2}'
+hurl --test --variable host=$API orders.hurl
+```
+```python
+# pytest: auth matrix as parametrized data
+@pytest.mark.parametrize("token,expected", [(None,401), ("expired",401), ("user",403), ("admin",200)])
+def test_admin_endpoint_access(client, tokens, token, expected):
+    r = client.get("/admin/reports", headers=auth(tokens.get(token)))
+    assert r.status_code == expected
+```
 
-## Security-adjacent checks (see [[security-testing]] for depth)
-- IDOR: increment/guess another user's resource ID, confirm access is denied.
-- Mass assignment: send extra fields in a request body (e.g. `"role": "admin"`) and confirm the server ignores/rejects rather than applying them.
-- Injection: SQL/NoSQL/command-injection payloads in every string input, not just search boxes.
+## Security-adjacent checks (depth in `security-testing`)
+Object-level authorization by changing IDs · mass assignment (`"role":"admin"` in a body is ignored/rejected) · injection through every string field, header and filename · SSRF on any "fetch this URL" feature · excessive data exposure (fields the client never needs) · verbose errors.
+
+## Performance sanity
+Record p50/p95 latency per endpoint in the suite and fail on regressions beyond a threshold; deeper work in `performance-testing`.
 
 ## Reporting
-Include the exact request (method, URL, headers if relevant, body) and full response in bug reports — see [[bug-reporting]]. "The API is broken" without the request/response pair is not actionable.
+Include the exact request (method, URL, relevant headers, body) and the full response, plus environment and timestamp. "The API is broken" without the request/response pair is not actionable. Format: `bug-reporting`.
+
+## Related
+`contract-testing`, `graphql-testing`, `authn-authz-testing`, `integration-testing`, `security-testing`, `bug-reporting`

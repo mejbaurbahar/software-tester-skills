@@ -27,7 +27,7 @@ Flaky and unreliable tests are very often a test-data problem, not a test-logic 
 ## PII-safe test data (never use raw production data in lower environments)
 - **Masking/anonymization**: replace real names/emails/PII with synthetic equivalents that preserve format and referential consistency (same person's email stays consistent across tables) but contain no real personal data.
 - **Data subsetting**: pull a realistic-sized, referentially-consistent subset rather than a full production dump, both for safety and to keep lower environments fast/cheap.
-- If a project currently copies raw production data into staging/dev, flag it as a real finding (privacy/compliance exposure) — this has come up as a genuine issue in this harness's own audits before, not a hypothetical.
+- If a project currently copies raw production data into staging/dev, flag it as a real finding (privacy/compliance exposure) and recommend masked or synthetic data instead.
 
 ## Seeding & fixtures
 - Prefer **API-driven seeding** (call the app's own create endpoints) over direct DB inserts where feasible — it exercises the same validation path production traffic does and won't silently drift from the real schema/business rules.

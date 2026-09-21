@@ -10,43 +10,41 @@ metadata:
 
 # Functional Testing
 
-## Purpose
-Verify the system does what it's supposed to do, per requirements/acceptance criteria — as opposed to non-functional concerns (performance, security, accessibility, which have their own skills).
+Verify the system does what the requirements and acceptance criteria say, from the user's point of view. Non-functional qualities (performance, security, accessibility) have their own skills.
 
 ## Workflow
-1. **Extract acceptance criteria** from the spec/ticket. If none exist, derive them from the UI/PRD and confirm with the user before testing against assumptions.
-2. **Map the happy path** first — the primary flow the feature exists for.
-3. **Enumerate alternate flows** — every branch, conditional, optional field, toggle.
-4. **Enumerate negative flows** — invalid input, missing required fields, unauthorized actions, expired tokens.
-5. **Cross-check business rules**, not just UI behavior: does a discount actually apply to the order total in the DB, not just render a strikethrough price?
+1. **Extract acceptance criteria** from the spec/ticket. If none exist, derive them from the UI/PRD and confirm before testing against assumptions (`requirements-testing-review`).
+2. **Happy path first:** the primary flow the feature exists for.
+3. **Alternate flows:** every branch, conditional, optional field, toggle, role.
+4. **Negative flows:** invalid input, missing required fields, unauthorized actions, expired sessions, duplicate submissions.
+5. **Derive cases systematically** (`test-design-techniques`): partitions and boundaries, decision tables for business rules, state models for lifecycles.
+6. **Cross-check business rules beyond the UI:** does the discount change the persisted order total, not just a struck-through price?
 
-## CRUD feature checklist
-For any Create/Read/Update/Delete surface:
-- **Create**: required-field validation, duplicate handling, default values, success feedback, record actually persisted (verify via API/DB, not just toast message).
-- **Read**: pagination edges (page 0, last page, empty list), sorting/filtering combinations, stale-data-after-mutation.
-- **Update**: partial updates, concurrent-edit conflicts, optimistic UI vs. actual persisted state, validation re-applied on edit.
-- **Delete**: soft vs hard delete, cascading effects (does deleting a parent orphan children?), confirmation dialogs, undo if offered, permissions.
+## CRUD checklist
+| Operation | Verify |
+| :--- | :--- |
+| **Create** | Required/optional validation, duplicates, defaults, success feedback, record actually **persisted** (API/DB, not just a toast), audit fields |
+| **Read** | Empty list, page 0/last page, sort/filter combinations, stale data after mutation, permission-filtered results |
+| **Update** | Partial updates, concurrent edit conflicts, optimistic UI vs persisted state, validation re-applied, history/audit |
+| **Delete** | Soft vs hard delete, cascades and orphans, confirmation, undo, permissions, referential integrity |
 
-## Form testing checklist
-- Required vs optional field enforcement, client-side AND server-side (client validation is not security or correctness).
-- Field-level constraints: min/max length, type coercion, format (email, phone, date locale).
-- Submit button state (disabled during submission — prevents double-submit bugs).
-- Error message accuracy — does it point to the right field, in plain language?
-- Autosave/draft behavior if present.
-- Tab order and keyboard-only submission.
+## Form checklist
+Required vs optional enforced **client and server side** · field constraints (length, type, format, locale) · unicode/emoji/whitespace · submit disabled while in flight (double-submit) · error text points at the right field in plain language · autosave/draft behavior · tab order and keyboard submit · paste and browser autofill · file upload limits.
 
-## Multi-step workflow testing (checkout, onboarding, wizards)
-- Test abandoning at each step and resuming.
-- Test going back a step and changing an earlier answer — does downstream state update or go stale?
-- Test the flow twice in a row without refresh (session/state leakage between runs).
-- Verify the final committed state server-side matches what the wizard displayed.
+## Multi-step workflows (checkout, onboarding, wizards)
+Abandon and resume at each step · go back and change an earlier answer (does downstream state update?) · run the flow twice without a refresh (state leakage) · browser back/forward/refresh mid-flow · session expiry mid-flow · final committed state equals what the wizard displayed.
 
 ## Business logic verification
-Don't trust the UI as the oracle. Cross-check calculated values (totals, discounts, tax, permissions-derived visibility) against:
-- API response payloads (use Chrome DevTools MCP / Claude in Chrome network tab, or curl the endpoint directly).
-- Database state when accessible.
+Do not treat the UI as the oracle. Cross-check totals, discounts, taxes, eligibility and permission-derived visibility against API responses (browser network tab or `curl`) and, where accessible, the database.
 
-## Tooling in this harness
-- Use Claude in Chrome or Chrome DevTools MCP for live DOM/network verification (see the `claude-in-chrome` skill).
-- For flows worth repeating, promote to the [[test-automation]] skill instead of re-running manually every time.
-- Log defects via [[bug-reporting]].
+## Data and environment
+Realistic and edge data (`test-data-engineering`): long names, special characters, boundary quantities/amounts, time zones (`date-time-timezone-testing`), multiple roles and locales. Record build, environment and data used for reproducibility.
+
+## Tooling
+Browser DevTools (network, console, storage), Playwright/Cypress for repeatable flows (`test-automation`), API clients for state checks (`api-testing`). Automate flows you run repeatedly; log defects with `bug-reporting`.
+
+## Exit criteria
+All Must acceptance criteria verified · no open Sev1/Sev2 · Sev3 defects triaged with workarounds · coverage of requirements traced (`test-planning-documentation`).
+
+## Related
+`manual-testing`, `exploratory-testing`, `acceptance-testing`, `regression-testing`, `test-design-techniques`, `bug-reporting`

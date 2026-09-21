@@ -10,27 +10,41 @@ metadata:
 
 # Accessibility Testing
 
-## Baseline: WCAG 2.1/2.2 AA
-Most legal/compliance requirements target AA. Structure the audit around the four POUR principles:
-- **Perceivable** — alt text on images, captions on video, sufficient color contrast, content not conveyed by color alone.
-- **Operable** — full keyboard operability, no keyboard traps, visible focus indicators, skip-to-content link, no seizure-inducing flashing.
-- **Understandable** — clear labels, consistent navigation, error messages that say how to fix the problem (not just "invalid input").
-- **Robust** — valid semantic HTML, correct ARIA usage (or none — wrong ARIA is worse than no ARIA), works across assistive tech.
+Target **WCAG 2.2 Level AA** (the basis of most laws: ADA/Section 508, EN 301 549, European Accessibility Act). Automated tools find roughly a third of issues; the rest need keyboard and assistive-technology checks and human judgment.
 
-## Practical audit pass
-1. **Automated scan first** (fast, catches ~30-40% of issues): axe-core via browser extension, or Lighthouse's accessibility category (`lighthouse_audit` in Chrome DevTools MCP covers this).
-2. **Keyboard-only pass**: unplug the mouse mentally — Tab through the entire page. Every interactive element must be reachable, in a logical order, with a visible focus ring. Modals must trap focus while open and return it on close. Nothing should require a mouse-only gesture (hover-only menus, drag-and-drop with no keyboard alternative).
-3. **Screen reader spot-check**: VoiceOver on macOS (Cmd+F5) for at least the primary flow — does it announce meaningful labels, form errors, and dynamic content changes (`aria-live` regions)? Icon-only buttons must have accessible names.
-4. **Color contrast**: 4.5:1 for normal text, 3:1 for large text/UI components (AA). Check via browser DevTools contrast checker, not eyeballing.
-5. **Forms**: every input has a programmatically associated `<label>`, required fields are announced as required (not just visually marked with an asterisk), errors are associated with their field via `aria-describedby`.
-6. **Zoom/reflow**: page usable at 200% browser zoom without horizontal scroll or clipped content.
+## Organize by POUR
+- **Perceivable:** text alternatives, captions/transcripts, contrast, not color-only, resize/reflow, orientation.
+- **Operable:** everything keyboard-operable, no traps, visible and unobscured focus, skip links, adequate target size, no seizure-inducing flashing, alternatives to drag gestures.
+- **Understandable:** clear labels and instructions, consistent navigation, helpful errors, no cognitive-test-only authentication.
+- **Robust:** valid semantics, correct ARIA (no ARIA is better than wrong ARIA), name/role/value exposed, status messages announced.
 
-## Common real bugs to specifically hunt for
-- `<div onclick>` instead of `<button>` — not keyboard-focusable, no accessible role.
-- Images with `alt=""` on content images (decorative-only pattern misapplied) vs. missing `alt` entirely on meaningful images.
-- Custom dropdowns/modals built without ARIA roles/states (`role="dialog"`, `aria-modal`, `aria-expanded`) — screen readers can't tell they exist.
-- Placeholder text used as the only label — disappears on focus, not a real label.
-- Low-contrast disabled-looking buttons that are actually clickable, or vice versa.
+**New in WCAG 2.2 (AA):** 2.4.11 Focus Not Obscured, 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum, 24×24 CSS px), 3.2.6 Consistent Help, 3.3.7 Redundant Entry, 3.3.8 Accessible Authentication.
 
-## Reporting
-File via [[bug-reporting]], citing the specific WCAG success criterion violated (e.g. "1.4.3 Contrast (Minimum)") — this makes severity/priority unambiguous and ties directly to compliance requirements when they apply.
+## Audit procedure
+1. **Automated scan** on every key page and state (open menus, dialogs, error states):
+   ```bash
+   npx @axe-core/cli https://staging.example.com --exit
+   npx pa11y https://staging.example.com --standard WCAG2AA
+   npx lighthouse https://staging.example.com --only-categories=accessibility --output=json
+   ```
+   ```ts
+   // Playwright + axe in CI
+   import AxeBuilder from '@axe-core/playwright';
+   const results = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag22aa']).analyze();
+   expect(results.violations).toEqual([]);
+   ```
+2. **Keyboard-only pass:** Tab/Shift+Tab through the full page. Everything reachable in a logical order with a **visible** focus indicator; menus/dialogs operable with Enter/Space/Arrows/Esc; modals trap focus and return it on close; no hover-only or drag-only actions; focus not hidden behind sticky headers.
+3. **Screen-reader pass** on the primary flow: VoiceOver (macOS/iOS), NVDA or JAWS (Windows), TalkBack (Android). Check that names/roles/states are announced, headings and landmarks give structure, dynamic changes use `aria-live`/`role="status"`, icon buttons have accessible names, and focus moves sensibly after route changes in SPAs.
+4. **Visual checks:** contrast 4.5:1 text, 3:1 large text and UI components/focus rings; 200% zoom and 400% reflow without horizontal scroll or clipping; text spacing overrides; Windows High Contrast/forced colors; `prefers-reduced-motion` respected; dark mode contrast.
+5. **Forms:** each input has a programmatically associated `<label>`; required state exposed (not just an asterisk); errors are text, associated via `aria-describedby`, and summarized/focused; `autocomplete` tokens set; no placeholder-only labels.
+6. **Media & documents:** captions, transcripts, audio descriptions where needed; accessible PDFs (tags, reading order).
+7. **Mobile/native:** touch target size, screen-reader gestures, orientation, dynamic type (`mobile-testing`).
+
+## Real bugs to hunt
+`<div onclick>` instead of `<button>` · missing/`alt=""` misuse on meaningful images · custom dropdown/modal/tabs without roles/states/keyboard model (follow WAI-ARIA Authoring Practices) · placeholder as only label · disabled-looking clickable controls · focus lost after dynamic updates · positive `tabindex` · reading order differing from visual order · links named "click here" · time limits with no extension · CAPTCHA with no alternative · error messages not announced.
+
+## Reporting and CI
+File each issue with the failing **WCAG success criterion** (for example 1.4.3 Contrast), element/selector, user impact, and a code-level fix; severity follows impact on task completion. Add automated checks to CI (axe in E2E, Lighthouse CI budget) and require zero new violations; keep a manual checklist for releases. Produce an accessibility conformance report (VPAT/ACR) when customers ask (`compliance-testing`).
+
+## Related
+`usability-testing`, `e2e-testing`, `mobile-testing`, `localization-testing`, `visual-testing`, `compliance-testing`

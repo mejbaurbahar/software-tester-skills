@@ -10,33 +10,64 @@ metadata:
 
 # Performance Testing
 
-## Frontend performance (Core Web Vitals)
-Use Chrome DevTools MCP `performance_start_trace` / `performance_analyze_insight` or `lighthouse_audit`, or Claude in Chrome, to measure:
-- **LCP** (Largest Contentful Paint) — target < 2.5s. Usually a hero image/font/render-blocking JS problem.
-- **INP** (Interaction to Next Paint, replaced FID) — target < 200ms. Heavy main-thread JS on interaction is the usual cause.
-- **CLS** (Cumulative Layout Shift) — target < 0.1. Usually images/ads/fonts without reserved dimensions.
-- **TTFB** (Time to First Byte) — server/CDN latency; if this is high, it's a backend/infra problem, not frontend.
+Answer three questions with numbers: **Is it fast enough? How much can it take? What breaks first?** Test against a production-like **staging** environment; never load-test production or third-party systems without explicit authorization and a scoped plan.
 
-Capture a trace, then check for: unoptimized images, render-blocking CSS/JS in `<head>`, missing `font-display: swap`, excessive third-party scripts, no CDN/caching headers on static assets.
+## Pick the test type (do not conflate them)
+| Type | Load shape | Finds |
+| :--- | :--- | :--- |
+| **Baseline/load** | Expected peak, sustained 15–60 min | Does the SLO hold at normal peak? |
+| **Stress / breakpoint** | Ramp past peak until it degrades | Ceiling and failure mode (graceful 429/503 vs cascading failure) |
+| **Spike** | Sudden 5–10× burst | Autoscaling lag, queue and cache behavior, recovery |
+| **Soak / endurance** | 60–80% load for 4–24 h | Leaks, pool exhaustion, log/disk growth (`memory-leak-resource-testing`) |
+| **Scalability** | Step resources 1×, 2×, 4× | Linear scaling or diminishing returns (`scalability-capacity-testing`) |
+| **Front-end/page-load** | Real browser, throttled CPU/network | Core Web Vitals (`web-performance-testing`) |
 
-## Backend load testing (locust, in the qa-agent venv)
-Test types, don't conflate them:
-- **Load test** — expected peak traffic, sustained, confirm latency/error rate stays acceptable.
-- **Stress test** — ramp beyond expected peak until it breaks, to find the actual ceiling and failure mode (graceful degradation vs. cascading failure).
-- **Soak test** — moderate load sustained for hours, to catch memory leaks/connection-pool exhaustion that only show up over time.
-- **Spike test** — sudden traffic burst (e.g. 10x in 30s), to check autoscaling/rate-limiting behavior.
+## Set targets first
+Agree SLOs before running: p95/p99 latency, error rate, throughput, resource ceilings (CPU < 70%). Without a target a number is just trivia. Compare with a **baseline** (last release); a 200 ms → 400 ms regression matters even if 400 ms "sounds fine".
 
-```bash
-~/qa-agent/.venv/bin/python -m locust -f locustfile.py --headless -u 100 -r 10 --run-time 5m --host https://target
+## Model realistic load
+Use production analytics for request mix, think time, session length and data distribution. Public traffic is an **open model** (arrival rate); internal tools are a **closed model** (fixed users). Little's Law: `concurrency = arrival rate × latency`. Seed realistic data volumes and vary parameters so caches do not make everything look fast.
+
+## Tools
+| Tool | Best for |
+| :--- | :--- |
+| **k6** | Developer-friendly JS scripts, thresholds, CI |
+| **Locust** | Python scenarios, distributed load |
+| **JMeter** | Protocol breadth (HTTP, JDBC, JMS), GUI-driven teams |
+| **Gatling** | High-throughput JVM/Scala/Kotlin DSL, rich reports |
+| **Artillery** | YAML scenarios, WebSocket/Socket.IO |
+| **autocannon / wrk / hey / vegeta** | Fast single-endpoint benchmarks |
+```js
+// k6: ramp, then assert SLOs (run: k6 run script.js)
+import http from 'k6/http'; import { check, sleep } from 'k6';
+export const options = {
+  stages: [{ duration: '2m', target: 50 }, { duration: '10m', target: 200 }, { duration: '2m', target: 0 }],
+  thresholds: { http_req_failed: ['rate<0.01'], http_req_duration: ['p(95)<500', 'p(99)<1200'] },
+};
+export default function () {
+  const r = http.get(`${__ENV.BASE}/api/products?limit=20`);
+  check(r, { 'status 200': (x) => x.status === 200 });
+  sleep(1);
+}
 ```
-- `-u` = concurrent users, `-r` = spawn rate/sec, watch p50/p95/p99 latency, not just average — averages hide the tail where users actually suffer.
-- Always test against staging, never production, unless the user explicitly authorizes and it's a deliberately scoped/rate-limited game-day test.
+```bash
+k6 run -e BASE=https://staging.example.com script.js
+locust -f locustfile.py --headless -u 200 -r 20 -t 15m --host https://staging.example.com --csv results
+curl -w "connect=%{time_connect}s ttfb=%{time_starttransfer}s total=%{time_total}s\n" -o /dev/null -s https://staging.example.com/api/health
+```
 
-## API latency benchmarking
-For single-endpoint checks: `curl -w "@curl-format.txt" -o /dev/null -s <url>` to get connect/TTFB/total timing breakdown, or script repeated `requests` calls and report p50/p95/p99.
+## Read results correctly
+- Use **percentiles (p50/p95/p99)**, never averages; the tail is where users suffer.
+- Watch **errors and saturation** alongside latency; find the knee where latency rises faster than throughput.
+- Avoid **coordinated omission** (closed-loop tools hide queueing); prefer arrival-rate executors.
+- Monitor the **load generator** too; if it is the bottleneck the test is invalid.
+- Correlate with server metrics/traces (USE: utilization, saturation, errors; RED: rate, errors, duration) to name the first bottleneck: app CPU/GC, thread or connection pool, DB (slow queries, locks, IOPS), cache, downstream API, network.
 
-## What "good" looks like
-Don't just report a number — compare against a baseline (previous release, competitor, or an explicit SLA/budget the team has agreed to). A regression from 200ms → 400ms matters even if 400ms sounds "fine" in isolation.
+## Database and API-level checks
+Slow-query log and `EXPLAIN` on the top queries, N+1 detection, index use, connection-pool sizing, payload size and compression, cache hit ratio, pagination limits.
 
-## Reporting
-Include: test type, load profile, environment, p50/p95/p99 latency, error rate, and — critically — what broke first when you pushed past capacity (DB connection pool? memory? a specific endpoint?). Use [[bug-reporting]] for perf regressions found as defects.
+## Report
+Test type and load profile · environment and data size · p50/p95/p99, throughput, error rate · **what broke first** and evidence · comparison to baseline/SLO · recommendations and retest plan. File regressions with `bug-reporting`.
+
+## Related
+`scalability-capacity-testing`, `web-performance-testing`, `memory-leak-resource-testing`, `chaos-resilience-testing`, `observability-testing`
