@@ -1,6 +1,6 @@
 {
   "name": "software-tester-skills",
-  "description": "Comprehensive Agent Skills library for Software Testing & QA",
+  "description": "Software testing and QA skills and commands for AI coding agents",
   "owner": {
     "name": "Mejbaur Bahar",
     "email": "mejbaur.bahar@gmail.com"
@@ -8,13 +8,26 @@
   "plugins": [
     {
       "name": "software-tester-skills",
-      "description": "Comprehensive Agent Skills library for Software Testing & QA: 47 specialized skills covering Unit, E2E, 42Crunch API Security, Performance, Accessibility, and Autonomous QA",
-      "version": "1.0.0",
+      "description": "97 Agent Skills and 21 slash commands for software testing and QA: unit, API, E2E, performance, security, accessibility, data, mobile, AI/LLM and more. Works in Claude Code, Antigravity, Gemini CLI, Codex and Cursor.",
+      "version": "2.0.0",
       "source": "./",
       "author": {
         "name": "Mejbaur Bahar",
         "email": "mejbaur.bahar@gmail.com"
-      }
+      },
+      "category": "testing",
+      "keywords": [
+        "testing",
+        "qa",
+        "sdet",
+        "software-testing",
+        "test-automation",
+        "agent-skills",
+        "claude-code",
+        "antigravity",
+        "gemini-cli",
+        "codex"
+      ]
     }
   ]
 }

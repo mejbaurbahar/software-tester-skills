@@ -1,23 +1,40 @@
-name: Validate Skills
+name: Validate
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Run Agent Skills Validation
+          python-version: "3.11"
+      - name: Validate skills, commands, router, manifests, README, adapters
+        run: python3 tests/validate_skills.py
+      - name: Shell checks
         run: |
-          python3 tests/validate_skills.py
+          bash -n install.sh
+          shellcheck -S warning install.sh
+      - name: Installer smoke test (isolated HOME)
+        run: |
+          export HOME="$(mktemp -d)"; mkdir -p "$HOME/.claude" "$HOME/.gemini" "$HOME/.cursor" "$HOME/.codex"
+          ./install.sh --dry-run >/dev/null
+          ./install.sh --auto >/dev/null
+          test "$(ls "$HOME/.claude/skills" | wc -l)" -eq "$(ls skills | wc -l)"
+          test -f "$HOME/.claude/commands/test-plan.md"
+          test -f "$HOME/.gemini/commands/qa/test-plan.toml"
+          ./install.sh --auto >/dev/null            # idempotent re-run
+          ./install.sh --all --uninstall >/dev/null
+          test -z "$(ls -A "$HOME/.claude/skills" 2>/dev/null)"
+      - name: Site builds
+        run: |
+          python3 scripts/build_site.py
+          test "$(ls _site/skills | wc -l)" -eq "$(ls skills | wc -l)"
+          test -f _site/sitemap.xml && test -f _site/llms.txt && test -f _site/install.sh

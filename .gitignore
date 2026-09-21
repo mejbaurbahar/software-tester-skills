@@ -1,0 +1,8 @@
+_site/
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+node_modules/
+*.bak-*
+.remember/

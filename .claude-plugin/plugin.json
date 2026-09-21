@@ -1,12 +1,13 @@
 {
   "name": "software-tester-skills",
-  "description": "Comprehensive Agent Skills library for Software Testing & QA: 47 specialized skills covering Unit, E2E, 42Crunch API Security, Performance, Accessibility, and Autonomous QA",
-  "version": "1.0.0",
+  "description": "97 Agent Skills and 21 slash commands for software testing and QA: unit, API, E2E, performance, security, accessibility, data, mobile, AI/LLM and more. Works in Claude Code, Antigravity, Gemini CLI, Codex and Cursor.",
+  "version": "2.0.0",
   "author": {
     "name": "Mejbaur Bahar",
-    "email": "mejbaur.bahar@gmail.com"
+    "email": "mejbaur.bahar@gmail.com",
+    "url": "https://github.com/mejbaurbahar"
   },
-  "homepage": "https://github.com/mejbaurbahar/software-tester-skills",
+  "homepage": "https://mejbaurbahar.github.io/software-tester-skills/",
   "repository": "https://github.com/mejbaurbahar/software-tester-skills.git",
   "license": "MIT",
   "keywords": [
@@ -14,11 +15,19 @@
     "qa",
     "sdet",
     "software-testing",
-    "42crunch",
-    "api-security",
-    "e2e",
+    "test-automation",
+    "agent-skills",
+    "claude-code",
+    "antigravity",
+    "gemini-cli",
+    "codex",
+    "cursor",
     "playwright",
+    "api-testing",
     "security-testing",
+    "performance-testing",
+    "accessibility",
+    "llm-testing",
     "quality-assurance"
   ]
 }

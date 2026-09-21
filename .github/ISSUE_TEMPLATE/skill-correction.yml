@@ -1,0 +1,12 @@
+name: Wrong or outdated guidance
+description: A command, flag, tool name or recommendation in a skill is incorrect
+labels: [correction]
+body:
+  - type: input
+    id: skill
+    attributes: { label: Skill name, placeholder: "e.g. k6 flag in performance-testing" }
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes: { label: What is wrong and what is correct? Include a source if you can. }
+    validations: { required: true }

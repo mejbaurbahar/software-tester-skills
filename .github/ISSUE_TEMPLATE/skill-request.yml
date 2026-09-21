@@ -1,0 +1,15 @@
+name: Skill request
+description: Suggest a testing type, tool or workflow that should have a skill
+labels: [skill-request]
+body:
+  - type: input
+    id: topic
+    attributes: { label: Testing topic, placeholder: "e.g. contract testing for gRPC" }
+    validations: { required: true }
+  - type: textarea
+    id: why
+    attributes: { label: What should the agent do differently once this skill exists? }
+    validations: { required: true }
+  - type: textarea
+    id: refs
+    attributes: { label: Tools, standards or references it should cover }
