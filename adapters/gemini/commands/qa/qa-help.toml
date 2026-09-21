@@ -1,0 +1,9 @@
+# Generated from commands/qa-help.md by scripts/build_adapters.py - do not edit by hand.
+description = "Find the right testing skill or command for your task"
+prompt = '''
+Recommend testing skills for: {{args}}
+
+Use the `qa-skill-router` skill.
+
+Match the request to at most five skills from the catalog, say why each fits in one line, and give the order to apply them. If {{args}} is empty, list the skill categories with two example skills each.
+'''

@@ -1,0 +1,11 @@
+<!-- Generated from commands/release-check.md by scripts/build_adapters.py - do not edit by hand. -->
+# Go/no-go release readiness assessment with evidence
+
+Assess release readiness for: the text the user typed after this command (ask if none)
+
+Use the `release-readiness-testing`, `smoke-sanity-testing`, `regression-testing` and `test-metrics-reporting` skills.
+
+1. Gather evidence: CI status, test results, open bugs by severity, dependency and secret scan results, migration and config changes, rollback plan.
+2. Score each gate (functional, non-functional, data, operability, rollout, compliance) as pass, risk or fail with the evidence.
+3. Lead with the recommendation: GO, GO with risks, or NO-GO, then the reasons. Do not run anything against production.
+4. List the accepted risks with owners and the rollback and monitoring plan.

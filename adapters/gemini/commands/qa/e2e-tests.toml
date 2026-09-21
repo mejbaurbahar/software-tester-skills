@@ -1,0 +1,13 @@
+# Generated from commands/e2e-tests.md by scripts/build_adapters.py - do not edit by hand.
+description = "Write resilient end-to-end browser tests for a user journey"
+prompt = '''
+Write end-to-end tests for: {{args}}
+
+Use the `e2e-testing`, `test-automation`, `flaky-test-management` and `accessibility-testing` skills.
+
+1. Identify the journey and the critical assertions. Prefer few, high-value journeys over many shallow ones.
+2. Use Playwright (or the framework already in the repo). Use role/label-based locators, web-first assertions and auto-waiting. Never use fixed sleeps.
+3. Isolate data per test (unique IDs, API setup, storage state for login).
+4. Run the tests repeatedly (`--repeat-each=5`) to check stability, with trace on failure.
+5. Report what is covered, what is not, and any flakiness found.
+'''
