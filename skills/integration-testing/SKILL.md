@@ -1,6 +1,11 @@
 ---
 name: integration-testing
 description: Use when verifying interactions between multiple components, modules, or services — API-to-database persistence, message queues, external service adapters, and Testcontainers.
+license: MIT
+metadata:
+  category: code-level
+  version: "2.0"
+  tags: integration, testcontainers, persistence, queues, adapters
 ---
 
 # Integration Testing

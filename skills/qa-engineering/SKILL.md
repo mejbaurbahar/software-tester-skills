@@ -1,6 +1,11 @@
 ---
 name: qa-engineering
-description: World-class QA engineering - systematic testing, automation, and the mindset that finds bugs before users doUse when "QA, quality assurance, testing, test automation, e2e tests, integration tests, regression testing, test coverage, playwright, cypress, selenium, test suite, bug report, test strategy, flaky tests, testing, QA, automation, e2e, integration, regression, quality" mentioned. 
+description: Use when setting up or improving end-to-end QA practice — systematic test design, automation strategy (Playwright/Cypress/Selenium), defect lifecycle, regression and flaky-test control, and QA mindset for catching bugs before users do.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: qa, test-automation, defect-lifecycle, test-strategy, quality
 ---
 
 # Qa Engineering

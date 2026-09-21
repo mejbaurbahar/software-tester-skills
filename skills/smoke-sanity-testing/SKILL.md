@@ -1,6 +1,11 @@
 ---
 name: smoke-sanity-testing
 description: Use when designing or executing smoke tests and sanity suites — Build Verification Testing (BVT), pre-flight deployment verification, critical-path health checks, and fast-fail gating.
+license: MIT
+metadata:
+  category: functional
+  version: "2.0"
+  tags: smoke, sanity, bvt, health-check, ci-gate
 ---
 
 # Smoke & Sanity Testing

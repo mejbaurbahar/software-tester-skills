@@ -1,6 +1,11 @@
 ---
 name: cloud-infrastructure-testing
 description: Use when testing cloud/infrastructure concerns — Docker/Kubernetes deployments, serverless functions, managed-service integration (S3, queues, API Gateway), disaster recovery/failover, and infra-as-code correctness on AWS/Azure/GCP.
+license: MIT
+metadata:
+  category: operations
+  version: "2.0"
+  tags: docker, kubernetes, cloud, failover, infrastructure
 ---
 
 # Cloud & Infrastructure Testing

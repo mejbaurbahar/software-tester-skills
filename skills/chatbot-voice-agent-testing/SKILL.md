@@ -1,6 +1,11 @@
 ---
 name: chatbot-voice-agent-testing
 description: Use when testing chatbots, voice assistants, or conversational AI agents specifically — multi-turn conversation flow, context/memory retention, intent recognition, STT/TTS accuracy, interrupt handling, and fallback behavior. Builds on llm-testing for the underlying model concerns.
+license: MIT
+metadata:
+  category: ai
+  version: "2.0"
+  tags: chatbot, voice-agent, conversation, intent, stt, tts
 ---
 
 # Chatbot / Voice / Conversational Agent Testing

@@ -1,6 +1,11 @@
 ---
 name: security-owasp
-description: Expert at securing web applications against OWASP Top 10 vulnerabilities. Covers authentication, authorization, input validation, XSS prevention, CSRF protection, secure headers, and security testing. Treats security as a first-class requirement, not an afterthought. Use when "security, OWASP, XSS, CSRF, SQL injection, authentication security, authorization, input validation, secure headers, vulnerability, penetration testing, security, owasp, authentication, authorization, xss, csrf, injection, headers" mentioned. 
+description: Use when securing a web application against OWASP Top 10 risks — authentication, authorization, input validation, XSS and CSRF prevention, secure headers, and security test cases.
+license: MIT
+metadata:
+  category: security
+  version: "2.0"
+  tags: owasp-top-10, xss, csrf, injection, secure-headers
 ---
 
 # Security Owasp

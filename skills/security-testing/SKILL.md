@@ -1,6 +1,11 @@
 ---
 name: security-testing
 description: Use for authorized security/penetration testing of web apps and APIs — OWASP Top 10 checks, auth/session testing, header/config audits, and vulnerability triage. Only for systems the user owns or has explicit authorization to test.
+license: MIT
+metadata:
+  category: security
+  version: "2.0"
+  tags: security-testing, owasp, session, auth-bypass, vulnerabilities
 ---
 
 # Security Testing

@@ -1,6 +1,11 @@
 ---
 name: functional-testing
 description: Use when verifying that a feature or user flow behaves according to requirements/specs — functional correctness testing of forms, workflows, business logic, and CRUD operations, whether done manually or via automation.
+license: MIT
+metadata:
+  category: functional
+  version: "2.0"
+  tags: functional, forms, workflows, business-logic, crud
 ---
 
 # Functional Testing

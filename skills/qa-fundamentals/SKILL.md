@@ -1,6 +1,11 @@
 ---
 name: qa-fundamentals
 description: Use when scoping test strategy, writing a test plan, classifying testing types (QC vs QA, verification vs validation), applying risk-based prioritization, or navigating SDLC/STLC/Agile testing process questions. The conceptual root the other testing skills build on.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: stlc, test-levels, verification, validation, quality-metrics
 ---
 
 # QA Fundamentals

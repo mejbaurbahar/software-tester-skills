@@ -1,6 +1,11 @@
 ---
 name: performance-testing
 description: Use for load/stress/soak/spike testing, Core Web Vitals audits, Lighthouse checks, API latency benchmarking, and diagnosing slow pages or endpoints. Covers both frontend perf and backend load testing.
+license: MIT
+metadata:
+  category: non-functional
+  version: "2.0"
+  tags: performance, load-testing, k6, locust, lighthouse, web-vitals
 ---
 
 # Performance Testing

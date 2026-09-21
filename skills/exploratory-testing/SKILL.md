@@ -1,6 +1,11 @@
 ---
 name: exploratory-testing
 description: Use when conducting exploratory testing, unscripted bug hunting, and session-based test management — test charters, heuristics (SFDIPOT, Tours), timeboxed sessions, and exploratory debriefing.
+license: MIT
+metadata:
+  category: functional
+  version: "2.0"
+  tags: exploratory, sbtm, heuristics, tours, charters
 ---
 
 # Exploratory Testing

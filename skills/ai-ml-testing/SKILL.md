@@ -1,6 +1,11 @@
 ---
 name: ai-ml-testing
 description: Use when testing a classical ML model or ML-powered feature — accuracy/precision/recall/F1 evaluation, model regression testing, bias/fairness testing, and ML pipeline robustness. For LLM/generative-AI-specific testing (prompts, hallucination, RAG), use llm-testing instead.
+license: MIT
+metadata:
+  category: ai
+  version: "2.0"
+  tags: machine-learning, model-evaluation, drift, fairness, data-quality
 ---
 
 # AI / ML Testing

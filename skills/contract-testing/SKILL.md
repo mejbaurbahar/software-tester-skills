@@ -1,6 +1,11 @@
 ---
 name: contract-testing
 description: Use when testing integrations between services — consumer-driven contracts, microservice boundaries, event/message-queue testing (Kafka, webhooks), schema evolution, and backward compatibility between independently-deployed services.
+license: MIT
+metadata:
+  category: api-backend
+  version: "2.0"
+  tags: pact, consumer-driven-contracts, microservices, schema
 ---
 
 # Contract & Integration Testing

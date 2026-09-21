@@ -1,6 +1,11 @@
 ---
 name: mutation-testing
 description: Use when measuring test suite quality, finding false positives, and eliminating blind spots — injecting code mutations (mutants), mutation score, Mutmut, Stryker, and kill rate analysis.
+license: MIT
+metadata:
+  category: code-level
+  version: "2.0"
+  tags: mutation-testing, stryker, mutmut, test-quality, kill-rate
 ---
 
 # Mutation Testing

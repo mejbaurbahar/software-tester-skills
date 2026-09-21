@@ -1,6 +1,11 @@
 ---
 name: database-testing
 description: Use when verifying data integrity, CRUD correctness at the persistence layer, migrations, transactions/concurrency, or query correctness/performance — SQL and NoSQL. Use whenever a bug claim needs to be confirmed against actual stored state, not just UI/API appearance.
+license: MIT
+metadata:
+  category: data
+  version: "2.0"
+  tags: database, sql, acid, migrations, transactions, query-performance
 ---
 
 # Database Testing

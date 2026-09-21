@@ -1,6 +1,11 @@
 ---
 name: cicd-testing
 description: Use when designing or debugging test execution in CI/CD pipelines — PR gates, test tiering (smoke/regression/nightly), parallelization/sharding, quality gates, flaky-test tracking, and failure notification wiring. Covers GitHub Actions, GitLab CI, Jenkins and similar.
+license: MIT
+metadata:
+  category: automation
+  version: "2.0"
+  tags: ci-cd, quality-gates, test-sharding, github-actions, pipelines
 ---
 
 # CI/CD Testing

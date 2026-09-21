@@ -1,6 +1,11 @@
 ---
 name: test-automation
 description: Use when writing, structuring, or debugging automated tests — Playwright/Selenium E2E suites, pytest test design, page object models, CI test integration, and deciding what's worth automating.
+license: MIT
+metadata:
+  category: automation
+  version: "2.0"
+  tags: playwright, selenium, pytest, page-object-model, automation
 ---
 
 # Test Automation

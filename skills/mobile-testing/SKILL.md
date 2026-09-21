@@ -1,6 +1,11 @@
 ---
 name: mobile-testing
 description: Use when testing mobile apps (iOS/Android native, or responsive/mobile-web) — device/viewport matrices, touch gesture testing, mobile-specific network and lifecycle conditions, and app-store readiness checks.
+license: MIT
+metadata:
+  category: platform
+  version: "2.0"
+  tags: mobile, ios, android, touch, viewport, responsive
 ---
 
 # Mobile Testing

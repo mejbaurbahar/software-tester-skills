@@ -1,6 +1,11 @@
 ---
 name: llm-testing
 description: Use when testing LLM-powered features — prompt testing, hallucination/faithfulness checks, RAG evaluation, agent/tool-use testing, prompt injection and LLM security, regression testing across model/prompt versions, and cost/latency/token budget testing.
+license: MIT
+metadata:
+  category: ai
+  version: "2.0"
+  tags: llm, prompts, hallucination, rag, evals, token-budget
 ---
 
 # LLM Testing

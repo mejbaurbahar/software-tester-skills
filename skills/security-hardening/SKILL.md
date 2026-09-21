@@ -1,6 +1,11 @@
 ---
 name: security-hardening
-description: World-class application security - OWASP Top 10, secure coding patterns, and the battle scars from security incidents that could have been preventedUse when "security, secure, vulnerability, injection, xss, csrf, authentication, authorization, owasp, encryption, secret, password, token, sanitize, validate, escape, encode, harden, security, owasp, injection, xss, csrf, authentication, authorization, encryption, secrets, hardening" mentioned. 
+description: Use when hardening an application's security — OWASP Top 10 mitigations, secure coding patterns, authentication and authorization, secret handling, input validation/output encoding, and lessons from real security incidents.
+license: MIT
+metadata:
+  category: security
+  version: "2.0"
+  tags: hardening, owasp, secure-coding, secrets, headers
 ---
 
 # Security Hardening

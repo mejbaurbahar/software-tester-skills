@@ -1,6 +1,11 @@
 ---
 name: testing-strategies
-description: Good tests give you confidence to ship. Bad tests give you a false sense of security while slowing you down. The goal isn't 100% coverage - it's the right tests for the right things.  This skill covers the testing pyramid (unit, integration, E2E), when to use each, mocking strategies, and the patterns that make tests maintainable. The key insight: test behavior, not implementation. Your tests should survive refactoring.  2025 reality: Jest is still king for JavaScript. Vitest is faster. Playwright dominates E2E. pytest owns Python. The real challenge isn't which tool to use - it's knowing what to test and how. Use when "test, testing, unit test, integration test, e2e, jest, vitest, playwright, cypress, pytest, mock, fixture, tdd, testing, jest, vitest, playwright, pytest, tdd, unit-testing, e2e" mentioned. 
+description: Use when optimising a test suite for confidence and speed — the testing pyramid, mocking strategies, testing behavior instead of implementation, maintainable tests that survive refactoring, and modern tool choices (Jest, Vitest, Playwright, pytest).
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: testing-pyramid, mocking, maintainable-tests, confidence
 ---
 
 # Testing Strategies

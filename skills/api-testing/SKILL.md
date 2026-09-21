@@ -1,6 +1,11 @@
 ---
 name: api-testing
 description: Use when testing REST/GraphQL APIs directly — status codes, schema/contract validation, auth, pagination, rate limits, idempotency, and error responses. Use instead of driving the UI when the question is really about the API layer.
+license: MIT
+metadata:
+  category: api-backend
+  version: "2.0"
+  tags: rest, api, contract, status-codes, pagination, idempotency
 ---
 
 # API Testing

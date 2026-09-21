@@ -1,6 +1,11 @@
 ---
 name: accessibility-testing
 description: Use when auditing a web app for accessibility (a11y) — WCAG compliance, screen reader compatibility, keyboard navigation, color contrast, and semantic HTML/ARIA correctness.
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: accessibility, wcag, axe-core, screen-reader, keyboard, a11y
 ---
 
 # Accessibility Testing

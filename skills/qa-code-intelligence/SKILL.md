@@ -1,6 +1,11 @@
 ---
 name: qa-code-intelligence
 description: Use when reading source code to spot testability/risk issues before writing tests, generating test cases automatically from requirements/schemas/code, or doing root-cause/bug intelligence work — clustering failures, deduping reports, and reasoning from stack traces/logs to a likely cause.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: static-analysis, testability, test-generation, root-cause-analysis
 ---
 
 # QA Code Intelligence

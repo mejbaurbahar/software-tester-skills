@@ -1,6 +1,11 @@
 ---
 name: compatibility-testing
 description: Use when verifying software compatibility across environments, operating systems, database versions, backward/forward API compatibility, and migration rollback safety.
+license: MIT
+metadata:
+  category: non-functional
+  version: "2.0"
+  tags: compatibility, backward-compatibility, upgrades, environments
 ---
 
 # Compatibility & Migration Testing

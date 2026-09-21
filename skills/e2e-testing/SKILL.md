@@ -1,6 +1,11 @@
 ---
 name: e2e-testing
 description: Use when automating end-to-end user journeys through the browser or UI — Playwright, Cypress, user critical paths, resilient locators, session storage, network stubbing, and visual artifacts.
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: e2e, playwright, cypress, user-journeys, locators
 ---
 
 # End-to-End (E2E) Testing

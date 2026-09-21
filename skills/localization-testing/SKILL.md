@@ -1,6 +1,11 @@
 ---
 name: localization-testing
 description: Use when verifying internationalization (i18n) and localization (l10n) — string truncation, pseudo-localization, Right-to-Left (RTL) layout rendering, date/time/currency formatting, and UTF-8 encoding.
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: i18n, l10n, rtl, unicode, pseudo-localization, text-expansion
 ---
 
 # Localization (l10n) & Internationalization (i18n) Testing

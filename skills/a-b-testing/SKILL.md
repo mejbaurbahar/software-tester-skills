@@ -1,6 +1,11 @@
 ---
 name: a-b-testing
-description: The science of learning through controlled experimentation. A/B testing isn't about picking winners—it's about building a culture of validated learning and reducing the cost of being wrong.  This skill covers experiment design, statistical rigor, feature flagging, analysis, and building experimentation into product development. The best experimenters know that every test, positive or negative, teaches something valuable. Use when "a/b test, experiment, hypothesis, statistical significance, sample size, feature flag, variant, control, treatment, p-value, conversion rate, test winner, split test, experimentation, testing, statistics, feature-flags, hypothesis, growth, optimization, learning, validation" mentioned. 
+description: Use when designing or analysing controlled experiments — A/B and multivariate tests, hypotheses, sample size and power, statistical significance, SRM checks, feature-flag rollouts, guardrail metrics, and deciding whether a variant really won.
+license: MIT
+metadata:
+  category: domain
+  version: "2.0"
+  tags: ab-testing, experimentation, statistics, feature-flags, conversion
 ---
 
 # A B Testing

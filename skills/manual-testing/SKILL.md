@@ -1,6 +1,11 @@
 ---
 name: manual-testing
 description: Use when designing test cases, doing exploratory testing, writing test plans/checklists, or manually verifying a feature before or instead of automating it. Covers test case design techniques, exploratory charters, and test plan structure.
+license: MIT
+metadata:
+  category: functional
+  version: "2.0"
+  tags: manual-testing, test-cases, boundary-value, decision-tables, checklists
 ---
 
 # Manual Testing

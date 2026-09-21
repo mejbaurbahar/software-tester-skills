@@ -1,6 +1,11 @@
 ---
 name: usability-testing
 description: Use when evaluating usability, user friction, UI clarity, and workflow ergonomics — Nielsen Norman heuristics, form validation feedback, error recovery paths, cognitive load, and accessibility overlap.
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: usability, nielsen-heuristics, ux, friction, error-recovery
 ---
 
 # Usability & UX Testing

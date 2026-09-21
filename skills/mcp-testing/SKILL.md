@@ -1,6 +1,11 @@
 ---
 name: mcp-testing
-description: Testing strategies for MCP servers including unit tests, integration tests, schema validation, and security testingUse when "mcp testing, test mcp server, mcp inspector, mcp validation, mcp, testing, unit-testing, integration-testing, schema-validation" mentioned. 
+description: Use when testing Model Context Protocol (MCP) servers — unit and integration tests, tool/resource schema validation, JSON-RPC contract checks, MCP Inspector workflows, and security review of exposed tools.
+license: MIT
+metadata:
+  category: ai
+  version: "2.0"
+  tags: mcp, model-context-protocol, json-rpc, tool-schemas, inspector
 ---
 
 # Mcp Testing

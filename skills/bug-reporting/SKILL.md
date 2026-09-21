@@ -1,6 +1,11 @@
 ---
 name: bug-reporting
-description: Use whenever filing a defect found during any kind of testing — applies the harness's standard severity scale, report template, and evidence requirements so reports are consistent and actionable.
+description: Use whenever filing a defect found during any kind of testing — applies a standard severity scale, report template, and evidence requirements so bug reports are consistent, reproducible and actionable.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: bug-report, defect, severity, reproduction-steps, evidence
 ---
 
 # Bug Reporting

@@ -1,6 +1,11 @@
 ---
 name: qa-test-harness
-description: Comprehensive Software Testing and QA Agent Harness. Use this skill whenever the user asks to test software, inspect web applications via Chrome DevTools MCP, automate browser actions, verify APIs, write or run test suites, capture bugs, analyze console/network logs, or audit web performance.
+description: Use when the user asks to test software end to end with a live browser — inspect web apps via Chrome DevTools MCP, automate browser actions, verify APIs, run test suites, capture console/network evidence, and file structured bug reports.
+license: MIT
+metadata:
+  category: automation
+  version: "2.0"
+  tags: chrome-devtools, browser-automation, dom, network, console
 ---
 
 # Software Testing & QA Agent Harness

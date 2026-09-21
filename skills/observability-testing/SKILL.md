@@ -1,6 +1,11 @@
 ---
 name: observability-testing
 description: Use when correlating a test failure or production issue across logs, metrics, and traces to find root cause; when verifying that a feature emits the logging/metrics/alerting it needs; or when doing shift-right testing via production monitoring.
+license: MIT
+metadata:
+  category: operations
+  version: "2.0"
+  tags: observability, logs, metrics, traces, opentelemetry, monitoring
 ---
 
 # Observability & Production Testing

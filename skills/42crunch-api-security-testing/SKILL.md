@@ -1,6 +1,11 @@
 ---
 name: 42crunch-api-security-testing
 description: Use when auditing, scanning, or remediating OpenAPI/Swagger API definitions for security vulnerabilities — 42Crunch audit scoring, OWASP API Security Top 10 compliance, BOLA/BFLA prevention, schema strictness, and shift-left API CI/CD testing.
+license: MIT
+metadata:
+  category: security
+  version: "2.0"
+  tags: openapi, api-security, owasp-api, 42crunch, shift-left
 ---
 
 # 42Crunch API Security Testing

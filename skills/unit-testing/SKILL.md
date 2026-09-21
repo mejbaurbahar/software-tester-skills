@@ -1,6 +1,11 @@
 ---
 name: unit-testing
 description: Use when writing, refactoring, or auditing unit and component tests — isolated test doubles (mocks, stubs, spies), Arrange-Act-Assert (AAA) pattern, boundary value analysis, property-based testing, and code coverage.
+license: MIT
+metadata:
+  category: code-level
+  version: "2.0"
+  tags: unit-testing, aaa, mocks, stubs, boundary-value, pytest, jest
 ---
 
 # Unit & Component Testing

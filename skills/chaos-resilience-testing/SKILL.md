@@ -1,6 +1,11 @@
 ---
 name: chaos-resilience-testing
 description: Use when deliberately injecting failure (network latency/loss, service/dependency crash, resource exhaustion) to verify a system degrades gracefully instead of cascading — retries, circuit breakers, timeouts, backpressure. Requires explicit authorization and a scoped blast radius; never run against unscoped production without sign-off.
+license: MIT
+metadata:
+  category: non-functional
+  version: "2.0"
+  tags: chaos-engineering, resilience, fault-injection, circuit-breaker, retries
 ---
 
 # Chaos / Resilience Testing

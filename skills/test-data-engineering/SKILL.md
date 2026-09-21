@@ -1,6 +1,11 @@
 ---
 name: test-data-engineering
 description: Use when generating synthetic/realistic test data, seeding fixtures, masking PII for a test environment, or designing deterministic/reusable test datasets. Underpins reliable automation across all the other testing skills.
+license: MIT
+metadata:
+  category: data
+  version: "2.0"
+  tags: test-data, fixtures, data-masking, seeding, synthetic-data
 ---
 
 # Test Data Engineering

@@ -1,6 +1,11 @@
 ---
 name: llm-security-audit
-description: Comprehensive security auditing framework for LLM applications covering OWASP Top 10 for LLMs, threat modeling, penetration testing, and compliance with NIST AI RMF and ISO 42001Use when "security audit, llm pentest, ai security assessment, compliance audit, vulnerability assessment, security, audit, compliance, penetration-testing, owasp, llm" mentioned. 
+description: Use when auditing an LLM application's security posture — OWASP Top 10 for LLMs, threat modelling, data-leakage and prompt-handling review, and compliance mapping to NIST AI RMF and ISO 42001.
+license: MIT
+metadata:
+  category: ai
+  version: "2.0"
+  tags: llm-security, owasp-llm, prompt-injection, nist-ai-rmf, audit
 ---
 
 # Llm Security Audit

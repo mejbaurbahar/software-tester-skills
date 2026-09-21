@@ -1,6 +1,11 @@
 ---
 name: test-architect
-description: Testing strategy specialist for test pyramid design, test isolation, property-based testing, and quality gatesUse when "testing, test strategy, unit test, integration test, e2e, property testing, test pyramid, flaky test, test coverage, quality gate, testing, pytest, jest, unit-testing, integration-testing, e2e, property-testing, tdd, quality, ml-memory" mentioned. 
+description: Use when designing a test suite's architecture — test pyramid/trophy, test isolation, property-based testing, quality gates, and profiling slow or flaky suites.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: test-pyramid, isolation, quality-gates, test-suite-design
 ---
 
 # Test Architect

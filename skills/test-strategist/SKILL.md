@@ -1,6 +1,11 @@
 ---
 name: test-strategist
-description: Testing strategy and design - what to test, how to test, and when testing is overkill. From TDD to integration tests to knowing when to skip tests entirelyUse when "test, testing, unit test, integration test, e2e, TDD, test coverage, how to test, should I test, test pyramid, flaky test, testing, tdd, unit-tests, integration, e2e, test-pyramid, coverage, quality" mentioned. 
+description: Use when deciding what to test and how — risk-based test planning, TDD vs test-after, the right level (unit/integration/E2E) for each behavior, and recognising when a test is not worth writing.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: risk-based-testing, test-strategy, what-to-test, automation-vs-manual
 ---
 
 # Test Strategist

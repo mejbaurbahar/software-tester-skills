@@ -1,6 +1,11 @@
 ---
 name: regression-testing
 description: Use when validating that recent changes haven't broken existing functionality — building/running regression suites, deciding regression scope for a release, and impact analysis from a diff/changelog.
+license: MIT
+metadata:
+  category: functional
+  version: "2.0"
+  tags: regression, impact-analysis, test-selection, git-diff
 ---
 
 # Regression Testing

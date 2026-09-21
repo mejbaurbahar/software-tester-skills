@@ -1,6 +1,11 @@
 ---
 name: cross-browser-testing
 description: Use when testing across multiple browser engines, operating systems, and viewport dimensions — Chromium, Gecko (Firefox), WebKit (Safari), responsive breakpoints, and engine-specific CSS/JS quirks.
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: cross-browser, chromium, firefox, webkit, responsive
 ---
 
 # Cross-Browser & Cross-Platform Testing

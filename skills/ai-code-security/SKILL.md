@@ -1,6 +1,11 @@
 ---
 name: ai-code-security
-description: Security vulnerabilities in AI-generated code and LLM applications, covering OWASP Top 10 for LLMs, secure coding patterns, and AI-specific threat modelsUse when "ai code security, llm vulnerabilities, ai generated code review, owasp llm, secure ai development, security, ai, llm, owasp, code-review, vulnerabilities" mentioned. 
+description: Use when reviewing AI-generated code or LLM-integrated applications for security flaws — OWASP Top 10 for LLMs, insecure generated patterns, secret and dependency hygiene, and secure-by-default coding guidance.
+license: MIT
+metadata:
+  category: security
+  version: "2.0"
+  tags: ai-generated-code, llm-security, secure-coding, owasp-llm
 ---
 
 # Ai Code Security

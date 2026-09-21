@@ -1,6 +1,11 @@
 ---
 name: visual-testing
 description: Use when checking visual/layout correctness — screenshot/visual regression testing, design-system and Figma-to-production validation, responsive layout, dark mode/theming, typography and spacing consistency. Distinct from functional correctness or accessibility (though related).
+license: MIT
+metadata:
+  category: web
+  version: "2.0"
+  tags: visual-regression, screenshots, responsive, styling
 ---
 
 # Visual & UX Testing

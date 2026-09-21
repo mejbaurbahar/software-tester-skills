@@ -1,6 +1,11 @@
 ---
 name: autonomous-qa-orchestration
 description: Use when asked to autonomously test an application end-to-end with minimal hand-holding — discover, explore, plan, execute, investigate, report, and verify fixes as one continuous QA pass. The top-level playbook that pulls in the other testing skills as needed.
+license: MIT
+metadata:
+  category: strategy
+  version: "2.0"
+  tags: autonomous-testing, qa-agent, exploration, triage, orchestration
 ---
 
 # Autonomous QA Orchestration
