@@ -1,10 +1,11 @@
 # Software Tester Skills 🧪
 
 [![Agent Skills Standard](https://img.shields.io/badge/standard-agentskills.io-blue.svg)](https://agentskills.io)
-[![Skills Count](https://img.shields.io/badge/skills-46%20testing%20skills-green.svg)](#-skill-catalog)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin%20Ready-purple.svg)](https://code.claude.com/docs/en/plugins)
+[![Skills Count](https://img.shields.io/badge/skills-47%20testing%20skills-green.svg)](#-skill-catalog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-The definitive open-standard **Agent Skills library for Software Testing, SDET, and Quality Assurance**.
+The definitive open-standard **Agent Skills & Claude Code Plugin library for Software Testing, SDET, and Quality Assurance**.
 
 Equip any AI coding assistant or autonomous testing agent with senior-level testing methodologies, verification protocols, test design heuristics, and automation runbooks.
 
@@ -12,20 +13,35 @@ Equip any AI coding assistant or autonomous testing agent with senior-level test
 
 ## 🌐 Universal AI Assistant Compatibility
 
-Built strictly according to the **[Agent Skills open specification](https://agentskills.io)** using progressive disclosure. Fully compatible with:
+Built strictly according to the **[Agent Skills open specification](https://agentskills.io)** and **[Claude Code Plugin Architecture](https://code.claude.com/docs/en/plugins)** using progressive disclosure. Fully compatible with:
 
-* **Google Antigravity & Gemini CLI** (`~/.gemini/config/skills/` or `.agents/skills/`)
-* **Claude Code** (`~/.claude/skills/`)
-* **OpenAI Codex** (`~/.agents/skills/` or `.agents/skills/`)
-* **Cursor** (`.agents/skills/` or `.cursor/skills/`)
+* **Claude Code**: Ready for native plugin installation via `/plugin` or local `--plugin-dir`.
+* **Google Antigravity & Gemini CLI**: Installed directly to `~/.gemini/config/skills/` or `.agents/skills/`.
+* **OpenAI Codex**: Compatible with `~/.agents/skills/` or `.agents/skills/`.
+* **Cursor**: Compatible with `.agents/skills/` or `.cursor/skills/`.
 * **OpenCode / Pi / Hermes**
 * **Goose & DevHub**
 
 ---
 
-## ⚡ Quick Install
+## ⚡ Quick Installation
 
-### One-Line Install (All Harnesses)
+### Option 1: Install in Claude Code (Native Plugin)
+
+Add the marketplace and install directly inside your Claude Code session:
+
+```shell
+/plugin marketplace add mejbaurbahar/software-tester-skills
+/plugin install software-tester-skills
+```
+
+Or test locally with `--plugin-dir`:
+```bash
+git clone https://github.com/mejbaurbahar/software-tester-skills.git
+claude --plugin-dir ./software-tester-skills
+```
+
+### Option 2: Universal One-Line Install (All AI Environments)
 
 ```bash
 git clone https://github.com/mejbaurbahar/software-tester-skills.git
@@ -33,7 +49,7 @@ cd software-tester-skills
 ./install.sh --all
 ```
 
-### Install by Platform
+### Option 3: Install by Target Environment
 
 ```bash
 # For Google Antigravity & Gemini CLI
@@ -48,7 +64,7 @@ cd software-tester-skills
 
 ---
 
-## 📚 Complete Skill Catalog (46 Skills)
+## 📚 Complete Skill Catalog (47 Skills)
 
 ### 1. Test Strategy, Architecture & Quality Gates (8)
 * **[`test-architect`](skills/test-architect/SKILL.md)**: Test pyramid and trophy design, test isolation, quality gates, and test suite profiling.
@@ -84,7 +100,8 @@ cd software-tester-skills
 * **[`localization-testing`](skills/localization-testing/SKILL.md)**: Internationalization (i18n) & localization (l10n), text expansion, RTL layouts (Arabic/Hebrew), Unicode/UTF-8, and pseudo-localization.
 * **[`mobile-testing`](skills/mobile-testing/SKILL.md)**: Touch gestures, mobile viewport matrices, dynamic address bar shifts, and mobile-web responsiveness.
 
-### 5. Backend, API, Database & Contracts (5)
+### 5. Backend, API, Database & Contracts (6)
+* **[`42crunch-api-security-testing`](skills/42crunch-api-security-testing/SKILL.md)**: Automated contract-first OpenAPI/Swagger security audit, OWASP API Security Top 10 compliance, BOLA/BFLA prevention, schema strictness, and 42Crunch CI/CD shift-left integration.
 * **[`api-testing`](skills/api-testing/SKILL.md)**: REST, GraphQL, gRPC status codes, contract validation, auth tokens, pagination, rate limits, and idempotency.
 * **[`contract-testing`](skills/contract-testing/SKILL.md)**: Consumer-driven contracts (Pact), microservice boundaries, event schemas, and backward compatibility.
 * **[`database-testing`](skills/database-testing/SKILL.md)**: ACID verification, CRUD correctness, transaction rollbacks, migration integrity, and slow query profiling.
@@ -114,23 +131,30 @@ cd software-tester-skills
 
 ---
 
-## 💡 How Agent Skills Work
+## 🏛️ Marketplace Submission
 
-Agent Skills leverage **Progressive Disclosure**:
-1. **Zero Context Bloat**: Only the skill names and trigger descriptions are loaded into the agent's initial prompt (~200 tokens).
-2. **On-Demand Activation**: When you ask your agent to *"run an exploratory test on the checkout page"* or *"audit the API endpoints for security"*, the agent identifies the relevant skill and reads the full `SKILL.md` runbook just-in-time.
-3. **Rigorous Compliance**: Each skill provides checklists, heuristics, and anti-patterns that keep the agent disciplined, objective, and thorough.
+This plugin is configured for submission to the public Claude Code marketplaces:
+* **Community Marketplace**: `anthropics/claude-plugins-community`
+* **Direct Marketplace Addition**:
+  ```shell
+  /plugin marketplace add mejbaurbahar/software-tester-skills
+  /plugin install software-tester-skills
+  ```
+
+### Local Validation
+```bash
+# Validate against Claude Code plugin standards
+claude plugin validate --strict ./
+
+# Validate against Agent Skills standard
+python3 tests/validate_skills.py
+```
 
 ---
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on authoring new skills and running the validation suite.
-
-```bash
-# Validate all skills
-python3 tests/validate_skills.py
-```
 
 ---
 

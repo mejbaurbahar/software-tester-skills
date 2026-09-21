@@ -1,0 +1,24 @@
+{
+  "name": "software-tester-skills",
+  "description": "Comprehensive Agent Skills library for Software Testing & QA: 47 specialized skills covering Unit, E2E, 42Crunch API Security, Performance, Accessibility, and Autonomous QA",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mejbaur Bahar",
+    "email": "mejbaur.bahar@gmail.com"
+  },
+  "homepage": "https://github.com/mejbaurbahar/software-tester-skills",
+  "repository": "https://github.com/mejbaurbahar/software-tester-skills.git",
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "qa",
+    "sdet",
+    "software-testing",
+    "42crunch",
+    "api-security",
+    "e2e",
+    "playwright",
+    "security-testing",
+    "quality-assurance"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "software-tester-skills",
+  "description": "Comprehensive Agent Skills library for Software Testing & QA",
+  "owner": {
+    "name": "Mejbaur Bahar",
+    "email": "mejbaur.bahar@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "software-tester-skills",
+      "description": "Comprehensive Agent Skills library for Software Testing & QA: 47 specialized skills covering Unit, E2E, 42Crunch API Security, Performance, Accessibility, and Autonomous QA",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Mejbaur Bahar",
+        "email": "mejbaur.bahar@gmail.com"
+      }
+    }
+  ]
+}
