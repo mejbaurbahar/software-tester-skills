@@ -113,7 +113,7 @@ selected_skills() {
 
 # install_skill <name> <dest_root>
 install_skill() {
-  local name="$1" root="$2" src="$SKILLS_SRC/$1" dest="$2/$1"
+  local root="$2" src="$SKILLS_SRC/$1" dest="$2/$1"
   if [ -d "$dest" ] || [ -L "$dest" ]; then
     if [ -f "$dest/$MARKER" ]; then
       act "update  $dest" || { rm -rf "$dest"; }
